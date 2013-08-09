@@ -8,8 +8,8 @@ use Foswiki::Plugins ();
 
 use JSON;
 
-use version; our $VERSION = version->declare("v1.0.1");
-our $RELEASE = '1.0.1';
+use version; our $VERSION = version->declare("v1.0.2");
+our $RELEASE = '1.0.2';
 our $SHORTDESCRIPTION = 'Provides a simple context menu for AttachTables.';
 our $NO_PREFS_IN_TOPIC = 1;
 
@@ -147,7 +147,7 @@ sub _getLockDb {
 
 sub _getWebDAVUrl {
   my $server = $Foswiki::cfg{DefaultUrlHost};
-  my $location = $Foswiki::cfg{Plugins}{WebDAVLinkPlugin}{Location};
+  my $location = $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{WebDAVLocation};
   $location =~ s/\/*$//;
   $server =~ s/\/*$//;
   return "$server$location";
