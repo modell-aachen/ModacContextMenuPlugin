@@ -164,6 +164,7 @@
           'versions': {
             name: lang.manageVersions,
             icon: 'versions',
+            disabled: !kvpCanEdit,
             callback: function( key, opts ){
               var attachUrl = $(this).formatString(
                 "{0}/attach{1}/{2}/{3}?filename={4}",
