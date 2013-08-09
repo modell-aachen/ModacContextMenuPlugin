@@ -26,6 +26,7 @@ sub initPlugin {
     return 0;
   }
 
+  Foswiki::Func::registerTagHandler( 'PRETTYUSER', \&handlePrettyUserTag );
   Foswiki::Func::registerRESTHandler( 'isLocked', \&restIsLocked );
 
   my $jqAvailable = $Foswiki::cfg{Plugins}{JQueryPlugin}{Enabled};
@@ -57,6 +58,55 @@ META
 
   _attachPrefs( $web, $topic );
   return 1;
+}
+
+sub handlePrettyUserTag {
+  my( $session, $params, $topic, $web, $topicObject ) = @_;
+  my $wikiWord = $params->{_DEFAULT};
+  if ( $wikiWord =~ /(.+)\.(.+)/ ) {
+    return $2;
+  }
+
+  return $wikiWord;
+}
+
+sub restIsLocked {
+  my ( $session, $subject, $verb, $response ) = @_;
+  my $query = $session->{request};
+
+  my $web = $query->{param}->{w}[0];
+  my $topic = $query->{param}->{t}[0];
+  my $attachment = $query->{param}->{a}[0];
+
+  my $err = '{ "isLocked": 0 }';
+  return $err unless $web && $topic && $attachment;
+
+  my $fsvAvailable = $Foswiki::cfg{Plugins}{FilesysVirtualPlugin}{Enabled};
+  return $err unless $fsvAvailable;
+
+  my $lockdb = _getLockDb();
+  return $err unless $lockdb;
+
+  my $davUrl = _getWebDAVUrl();
+  my $path = "$davUrl/$web/$topic" . "_files/$attachment";
+  $path =~ s/^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$/$4$6/;
+  my @locks = $lockdb->getLocks( $path, 0 );
+
+  foreach my $lock (@locks) {
+    next unless $lock->{exclusive};
+
+    if ( $lock->{path} eq $path ) {
+      my $owner = $lock->{owner};
+      if  ( $owner =~ /<D:href>(.+)<\/D:href>/i ) {
+        $owner = $1;
+      }
+
+      my $wikiName = Foswiki::Func::userToWikiName( $owner, 1 );
+      return "{ \"isLocked\": 1, \"owner\": \"$wikiName\" }"
+    }
+  }
+
+  return $err;
 }
 
 sub _attachPrefs {
@@ -103,45 +153,6 @@ sub _attachPrefs {
     "MODACCONTEXTMENUPLUGIN",
     "<script type='text/javascript'>jQuery.extend( foswiki.preferences, { \"contextMenu\": { $kvpPrefs, $davPrefs, \"trashWeb\": \"%TRASHWEB%\" } } );</script>",
     "JQUERYPLUGIN::FOSWIKI::PREFERENCES" );
-}
-
-sub restIsLocked {
-  my ( $session, $subject, $verb, $response ) = @_;
-  my $query = $session->{request};
-
-  my $web = $query->{param}->{w}[0];
-  my $topic = $query->{param}->{t}[0];
-  my $attachment = $query->{param}->{a}[0];
-
-  my $err = '{ "isLocked": 0 }';
-  return $err unless $web && $topic && $attachment;
-
-  my $fsvAvailable = $Foswiki::cfg{Plugins}{FilesysVirtualPlugin}{Enabled};
-  return $err unless $fsvAvailable;
-
-  my $lockdb = _getLockDb();
-  return $err unless $lockdb;
-
-  my $davUrl = _getWebDAVUrl();
-  my $path = "$davUrl/$web/$topic" . "_files/$attachment";
-  $path =~ s/^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$/$4$6/;
-  my @locks = $lockdb->getLocks( $path, 0 );
-
-  foreach my $lock (@locks) {
-    next unless $lock->{exclusive};
-
-    if ( $lock->{path} eq $path ) {
-      my $owner = $lock->{owner};
-      if  ( $owner =~ /<D:href>(.+)<\/D:href>/i ) {
-        $owner = $1;
-      }
-
-      my $wikiName = Foswiki::Func::userToWikiName( $owner, 0 );
-      return "{ \"isLocked\": 1, \"owner\": \"$wikiName\" }"
-    }
-  }
-
-  return $err;
 }
 
 sub _getLockDb {
