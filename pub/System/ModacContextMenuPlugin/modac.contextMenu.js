@@ -645,11 +645,12 @@
           } );
 
           var response = $.parseJSON( result.responseText );
+          console.log( response );
           $('.data-title').livequery( function() {
             var menu = this;
-            var owner = response.owner || lang.guestUser;
+            var owner = response.owner;
             $(menu).attr( 'data-menutitle', $(this).formatString( lang.lockedBy, owner ) );
-            $('.data-title').expire();
+            if ( response.owner ) $('.data-title').expire();
           });
 
           $(icon).attr( 'src', origSrc );

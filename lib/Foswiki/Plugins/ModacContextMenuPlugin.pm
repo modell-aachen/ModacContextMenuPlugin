@@ -8,8 +8,8 @@ use Foswiki::Plugins ();
 
 use JSON;
 
-use version; our $VERSION = version->declare("v1.0.2");
-our $RELEASE = '1.0.2';
+use version; our $VERSION = version->declare("v1.0.3");
+our $RELEASE = '1.0.3';
 our $SHORTDESCRIPTION = 'Provides a simple context menu for AttachTables.';
 our $NO_PREFS_IN_TOPIC = 1;
 
@@ -131,8 +131,13 @@ sub restIsLocked {
     next unless $lock->{exclusive};
 
     if ( $lock->{path} eq $path ) {
-      my $owner = $lock->{owner} || '';
-      return "{ \"isLocked\": 1, \"owner\": \"$owner\" }"
+      my $owner = $lock->{owner};
+      if  ( $owner =~ /<D:href>(.+)<\/D:href>/i ) {
+        $owner = $1;
+      }
+
+      my $wikiName = Foswiki::Func::userToWikiName( $owner, 0 );
+      return "{ \"isLocked\": 1, \"owner\": \"$wikiName\" }"
     }
   }
 
