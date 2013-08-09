@@ -885,22 +885,6 @@
   });
 
   $(document).ready( function() {
-    var container = $('div.foswikiAttachments');
-    if ( $(container).length == 0 ) return;
-
-    if ( $.browser.mozilla ) {
-      $(this).checkFirefoxAddOn();
-      var body = $('body');
-      var hidden = '<div id="hiddenContainer" style="display:none;"></div>';
-      $(hidden).appendTo( body );
-    }
-
-    var table = $(container).find('table');
-    var tds = $(table).find('td.foswikiTableCol1');
-    $.each( tds, function( index, td ) {
-      $(this).attachContextMenu( td );
-    });
-
     // Testing
     var imgs = $('img.modacBookmarkStar');
     $.each( imgs, function( index, img ) {
@@ -917,6 +901,22 @@
       });
     });
     // Testing
+
+    var container = $('div.foswikiAttachments');
+    if ( $(container).length == 0 ) return;
+
+    if ( $.browser.mozilla ) {
+      $(this).checkFirefoxAddOn();
+      var body = $('body');
+      var hidden = '<div id="hiddenContainer" style="display:none;"></div>';
+      $(hidden).appendTo( body );
+    }
+
+    var table = $(container).find('table');
+    var tds = $(table).find('td.foswikiTableCol1');
+    $.each( tds, function( index, td ) {
+      $(this).attachContextMenu( td );
+    });
   });
 
 })(jQuery);

@@ -8,8 +8,8 @@ use Foswiki::Plugins ();
 
 use JSON;
 
-use version; our $VERSION = version->declare("v1.0.0");
-our $RELEASE = '1.0.0';
+use version; our $VERSION = version->declare("v1.0.1");
+our $RELEASE = '1.0.1';
 our $SHORTDESCRIPTION = 'Provides a simple context menu for AttachTables.';
 our $NO_PREFS_IN_TOPIC = 1;
 

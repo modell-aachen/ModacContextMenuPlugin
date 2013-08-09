@@ -13,6 +13,7 @@ pub/System/ModacContextMenuPlugin/modac.contextMenu.js 0444
 
 pub/System/ModacContextMenuPlugin/images/comment.png 0444
 pub/System/ModacContextMenuPlugin/images/download.png 0444
+pub/System/ModacContextMenuPlugin/images/delete.png 0444
 pub/System/ModacContextMenuPlugin/images/edit.png 0444
 pub/System/ModacContextMenuPlugin/images/locked.png 0444
 pub/System/ModacContextMenuPlugin/images/move.png 0444
