@@ -645,7 +645,6 @@
           } );
 
           var response = $.parseJSON( result.responseText );
-          console.log( response );
           $('.data-title').livequery( function() {
             var menu = this;
             var owner = response.owner;
@@ -657,6 +656,7 @@
           return response.isLocked ? lockedMenu : regularMenu;
         }
       });
+
     },
 
     blockUI: function() {
