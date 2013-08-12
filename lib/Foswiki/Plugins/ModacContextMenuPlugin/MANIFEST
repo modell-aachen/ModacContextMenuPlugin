@@ -26,3 +26,5 @@ pub/System/ModacContextMenuPlugin/images/star_add.png 0444
 pub/System/ModacContextMenuPlugin/images/star_remove.png 0444
 
 templates/attachtables.contextmenu.tmpl
+
+data/System/ModacContextMenuPlugin.txt 0444
