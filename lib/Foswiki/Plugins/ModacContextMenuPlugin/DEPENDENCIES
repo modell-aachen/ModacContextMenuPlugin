@@ -1,6 +1,6 @@
 ONLYIF ( $Foswiki::Plugins::VERSION < 2.3)
 Foswiki::Contrib::PatchFoswikiContrib, >=1.3, perl, Required if your extension vx.x.x style version (recommended).
 Foswiki::Plugins::JQueryPlugin,>=0,perl,Required, JQuery environment
-Foswiki::Plugins::FilesysVirtualPlugin,>=1.6.7, perl, Required if WebDAV should be enabled
-Foswiki::Contrib::WebDAVContrib,>=1.1.0, perl, Required if WebDAV should be enabled
+Foswiki::Plugins::FilesysVirtualPlugin,>=1.6.7, external, Required if WebDAV should be enabled
+Foswiki::Contrib::WebDAVContrib,>=1.1.0,external, Required if WebDAV should be enabled
 JSON,0,cpan,Javascript object notation module
