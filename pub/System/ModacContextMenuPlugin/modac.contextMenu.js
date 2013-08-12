@@ -799,8 +799,9 @@
 
     getOfficeApps: function() {
       var prefs = foswiki.getPreference( 'contextMenu' );
-      var apps = unescape( prefs.apps );
+      if ( !prefs.davIsEnabled ) return null;
 
+      var apps = unescape( prefs.apps );
       if ( apps == null || apps == '' ) {
         $(this).logError( "No Office apps specified." );
         return null;
@@ -811,6 +812,8 @@
 
     getWebDAVUrl: function() {
       var prefs = foswiki.getPreference( 'contextMenu' );
+      if ( !prefs.davIsEnabled ) return null;
+
       if ( !prefs.davHasUrl ) {
         $(this).logError( "No WebDAV location specified." );
         return null;
