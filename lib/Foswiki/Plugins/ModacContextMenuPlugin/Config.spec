@@ -2,6 +2,10 @@
 #---++ ModacContextMenuPlugin
 
 # **BOOLEAN**
+# Toggle ContextMenu
+$Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{UseContextMenu} = 0;
+
+# **BOOLEAN**
 # Whether WebDAV should be enabled or not
 $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{WebDAVEnabled} = 0;
 

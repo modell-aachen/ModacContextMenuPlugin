@@ -44,9 +44,12 @@
       var web = foswiki.getPreference( 'WEB' );
       var topic = foswiki.getPreference( 'TOPIC' );
 
-      var newTopic = topic + '_files';
-      href = href.replace( topic, newTopic );
-      href = href.replace( pubPath, davUrl );
+      var davHref = href;
+      if ( hasDavUrl && hasHandler ) {
+        var newTopic = topic + '_files';
+        davHref = davHref.replace( topic, newTopic );
+        davHref = davHref.replace( pubPath, davUrl );
+      }
 
       // see de.js/en.jsr
       var lang = contextMenuStrings.lang;
@@ -61,7 +64,7 @@
             disabled: !isEditEnabled,
             callback: function( key, opts ) {
               if ( $.browser.msie ) {
-                return $(this).webdavInvokeIE( component, href );
+                return $(this).webdavInvokeIE( component, davHref );
               }
 
               if ( $.browser.mozilla ) {
@@ -71,7 +74,7 @@
                 }
                 var div = document.getElementById( 'hiddenContainer' );
                 var a = document.createElement( 'a' );
-                a.setAttribute( 'href', href );
+                a.setAttribute( 'href', davHref );
                 div.appendChild( a );
 
                 a.onclick = function( e ) {
@@ -906,6 +909,9 @@
       });
     });
     // Testing
+
+    var prefs = foswiki.getPreference( 'contextMenu' );
+    if ( !prefs.useContextMenu ) return;
 
     var container = $('div.foswikiAttachments');
     if ( $(container).length == 0 ) return;

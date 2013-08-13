@@ -9,8 +9,8 @@ use Foswiki::Plugins ();
 use JSON;
 
 use version;
-our $VERSION = version->declare("v1.0.8");
-our $RELEASE = '1.0.8';
+our $VERSION = version->declare("v1.0.9");
+our $RELEASE = '1.0.9';
 our $SHORTDESCRIPTION = 'Provides a simple context menu for AttachTables.';
 our $NO_PREFS_IN_TOPIC = 1;
 
@@ -149,10 +149,11 @@ sub _attachPrefs {
   }
 
   my $kvpPrefs = "\"kvpIsEnabled\": $kvpEnabled, \"kvpCanEdit\": $kvpCanEdit, \"kvpCanMove\": $kvpCanMove";
+  my $menuIsEnabled = $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{UseContextMenu} || 0;
   Foswiki::Func::addToZone(
     "script",
     "MODACCONTEXTMENUPLUGIN",
-    "<script type='text/javascript'>jQuery.extend( foswiki.preferences, { \"contextMenu\": { $kvpPrefs, $davPrefs, \"trashWeb\": \"%TRASHWEB%\" } } );</script>",
+    "<script type='text/javascript'>jQuery.extend( foswiki.preferences, { \"contextMenu\": { $kvpPrefs, $davPrefs, \"trashWeb\": \"%TRASHWEB%\", \"useContextMenu\": $menuIsEnabled } } );</script>",
     "JQUERYPLUGIN::FOSWIKI::PREFERENCES" );
 }
 
