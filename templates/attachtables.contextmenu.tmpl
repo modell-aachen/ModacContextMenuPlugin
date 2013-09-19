@@ -50,7 +50,7 @@
 
 %{ A basic row definition, for attachment table and attach screen }%
 %{ Use %A_URL% instead of %PUBURLPATH%/%WEB%/%TOPIC%/%A_FILE% to get a viewfile link }%
-%TMPL:DEF{ATTACH:files:row(basic)}%| %TMPL:P{"ATTACH:files:row(basic):buttons"}% | %A_ICON%<span class="foswikiHidden">%A_EXT%</span> &nbsp; <a href="%ATTACHURLPATH%/%ENCODE{%A_FILE%}%"><noautolink>%A_FILE%</noautolink></a> |  %A_SIZE%|<span class="foswikiNoBreak">%A_DATE%</span> | %PRETTYUSER{"%A_USER%}% | %A_COMMENT% |%TMPL:END%
+%TMPL:DEF{ATTACH:files:row(basic)}%| %TMPL:P{"ATTACH:files:row(basic):buttons"}% | %A_ICON%<span class="foswikiHidden">%A_EXT%</span> &nbsp; <a href="%ATTACHURLPATH%/%ENCODE{%A_FILE%}%"><noautolink>%A_FILE%</noautolink>&nbsp;&raquo;</a> |  %A_SIZE%|<span class="foswikiNoBreak">%A_DATE%</span> | %PRETTYUSER{"%A_USER%}% | %A_COMMENT% |%TMPL:END%
 
 %{
   <a href='%SCRIPTURLPATH{"attach"}%/%WEB%/%TOPIC%?filename=%ENCODE{"%A_FILE%"}%;revInfo=1' title='%MAKETEXT{"Update attachment"}%' rel='follow' class="requireModacChangePermission modacChanging">
