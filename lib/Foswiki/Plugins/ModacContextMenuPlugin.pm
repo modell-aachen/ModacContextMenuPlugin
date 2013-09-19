@@ -9,8 +9,8 @@ use Foswiki::Plugins ();
 use JSON;
 
 use version;
-our $VERSION = version->declare("v1.0.9");
-our $RELEASE = '1.0.9';
+our $VERSION = version->declare("v1.0.10");
+our $RELEASE = '1.0.10';
 our $SHORTDESCRIPTION = 'Provides a simple context menu for AttachTables.';
 our $NO_PREFS_IN_TOPIC = 1;
 
@@ -56,6 +56,8 @@ META
 
   Foswiki::Func::addToZone( 'head', 'MODACCONTEXTMENUPLUGIN:STYLES', $meta );
   Foswiki::Func::addToZone( 'script', 'MODACCONTEXTMENUPLUGIN:SCRIPTS', $script, 'JQUERYPLUGIN::FOSWIKI' );
+  Foswiki::Plugins::JQueryPlugin::createPlugin( 'blockui' );
+  Foswiki::Plugins::JQueryPlugin::createPlugin( 'livequery' );
 
   _attachPrefs( $web, $topic );
   return 1;
