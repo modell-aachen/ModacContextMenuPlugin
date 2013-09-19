@@ -11,7 +11,15 @@
 
       var $this = $(td);
       var href = $this.find('a').attr( 'href' );
-      var filename = $this.find('a').text();
+      var pattern = /.*\/(.+)$/;
+      var filename;
+      var match = pattern.exec( href );
+      if ( match != null && match.length > 1 ) {
+        filename = match[1];
+      } else {
+        // will produce HTTP 500 -> error dialog
+        filename = '#';
+      }
 
       var hasHandler = false;
       var component, componentName;
