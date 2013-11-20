@@ -2,9 +2,9 @@ var contextMenuStrings = new Object();
 contextMenuStrings.lang = {
   guestUser: 'WikiGuest',
   lockedBy: 'Gesperrt von {0}',
-  editAttachment: 'Anhang bearbeiten',
+  editAttachment: 'Datei bearbeiten',
   editAttachmentIn: 'In {0} bearbeiten',
-  downloadAttachment: 'Kopie herunterladen/&ouml;ffnen',
+  downloadAttachment: 'Kopie &ouml;ffnen',
   newVersion: 'Neue Version hochladen',
   newVersionDialogTitle: 'Anhang aktualisieren',
   manageVersions: 'Versionsverwaltung',
