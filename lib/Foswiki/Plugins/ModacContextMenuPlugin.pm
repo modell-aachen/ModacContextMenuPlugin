@@ -9,8 +9,8 @@ use Foswiki::Plugins ();
 use JSON;
 
 use version;
-our $VERSION = version->declare("v1.0.12");
-our $RELEASE = "1.0";
+our $VERSION = version->declare("v1.1.0");
+our $RELEASE = '1.1';
 our $SHORTDESCRIPTION = 'Provides a simple context menu for AttachTables.';
 our $NO_PREFS_IN_TOPIC = 1;
 
@@ -27,8 +27,11 @@ sub initPlugin {
     return 0;
   }
 
-  Foswiki::Func::registerTagHandler( 'PRETTYUSER', \&handlePrettyUserTag );
-  Foswiki::Func::registerRESTHandler( 'isLocked', \&restIsLocked );
+  # Removes the User's Web prefix. Intended for further modifications like wiki word to space separated word.
+  Foswiki::Func::registerTagHandler( 'PRETTYUSER', \&_handlePrettyUserTag );
+
+  # rest handler to interact with FilesysVirtualPlugin
+  Foswiki::Func::registerRESTHandler( 'isLocked', \&_restIsLocked );
 
   my $jqAvailable = $Foswiki::cfg{Plugins}{JQueryPlugin}{Enabled};
   unless ( $jqAvailable ) {
@@ -63,17 +66,19 @@ META
   return 1;
 }
 
-sub handlePrettyUserTag {
+sub _handlePrettyUserTag {
   my( $session, $params, $topic, $web, $topicObject ) = @_;
   my $wikiWord = $params->{_DEFAULT};
   if ( $wikiWord =~ /(.+)\.(.+)/ ) {
     return $2;
   }
 
+  # ToDo: WikiWord -> Wiki Word
+
   return $wikiWord;
 }
 
-sub restIsLocked {
+sub _restIsLocked {
   my ( $session, $subject, $verb, $response ) = @_;
   my $query = $session->{request};
 
@@ -90,6 +95,7 @@ sub restIsLocked {
   my $lockdb = _getLockDb();
   return $err unless $lockdb;
 
+  # query lockdb for existing (exclusive) locks.
   my $davUrl = _getWebDAVUrl();
   my $path = "$davUrl/$web/$topic" . "_files/$attachment";
   $path =~ s/^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$/$4$6/;
@@ -134,6 +140,7 @@ sub _attachPrefs {
   }
 
   my $davPrefs = "\"davIsEnabled\": 0";
+  # double checked in order to support virtual hosting.
   if ( $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{WebDAVEnabled} ) {
     my $server = $Foswiki::cfg{DefaultUrlHost};
     my $hasLocation = 1;

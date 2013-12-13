@@ -10,6 +10,8 @@
       var hasApps = apps != null;
 
       var $this = $(td);
+
+      // attach to second column of attachments table.
       var href = $this.find('a').attr( 'href' );
       var pattern = /.*\/(.+)$/;
       var filename;
@@ -33,6 +35,7 @@
         }
       }
 
+      // include KVP if available
       var kvpCanEdit = true;
       var kvpCanMove = true;
       if ( $(this).kvpIsEnabled() ) {
@@ -54,14 +57,17 @@
 
       var davHref = href;
       if ( hasDavUrl && hasHandler ) {
-        var newTopic = topic + '_files';
+        var newTopic = topic + '_files'; // hard corded in FilesysVirtual
         davHref = davHref.replace( topic, newTopic );
         davHref = davHref.replace( pubPath, davUrl );
       }
 
-      // see de.js/en.jsr
+      // see de.js/en.js
+      // language is set by Foswiki - don't rely on jQuery or navigator
       var lang = contextMenuStrings.lang;
 
+      // the default context menu definition
+      // lots of parsing to display the pop-up menus
       var regularMenu = {
         items: {
           'edit': {
@@ -508,6 +514,7 @@
         }
       };
 
+      // defines a less functionaly menu (used for locked files)
       var lockedMenu = {
         className: 'data-title',
         items: {
@@ -671,6 +678,7 @@
 
     },
 
+    // jQuery override - provides localized loading messages
     blockUI: function() {
       var lang = contextMenuStrings.lang;
       $.blockUI({
@@ -678,6 +686,8 @@
       });
     },
 
+    // tries to access a public resource of FF's qwiki-webdav addon.
+    // will fail when not available (not installed, not FF at all)
     checkFirefoxAddOn: function() {
       var img = document.createElement( 'img' );
       img.addEventListener( 'load', function( e ) {
@@ -719,6 +729,7 @@
       });
     },
 
+    // show a hint when the user is on FF but is not using qwiki-webdav addon
     createFirefoxAddonDialog: function() {
       var lang = contextMenuStrings.lang;
       var d = $('<div></div>');
@@ -752,6 +763,8 @@
       });
     },
 
+    // shows a login dialog.
+    // called when the user tries to call an access restricted method (e.g. view history)
     createLoginDialog: function( loginForm ) {
       var lang = contextMenuStrings.lang;
       var d = $('<div></div>');
@@ -792,6 +805,8 @@
       });
     },
 
+    // Helper. Provides a String.prototype to support format strings
+    // e.g. $(this).formatString( "Hello {0}! My name is {1}.", "World", "Mr. Foo" );
     formatString: function() {
       if ( !String.prototype.format ) {
         String.prototype.format = function() {
@@ -808,6 +823,7 @@
       return String.prototype.format.apply( args.shift(), args );
     },
 
+    // reads the office configuration provided by foswiki.
     getOfficeApps: function() {
       var prefs = foswiki.getPreference( 'contextMenu' );
       if ( !prefs.davIsEnabled ) return null;
@@ -874,6 +890,9 @@
       $.unblockUI();
     },
 
+    // fires an event (which will be handled by qwiki-webdav addon)
+    // in order to launch Office
+    // Mozilla only
     webdavInvokeFF: function( e ) {
       var ev = document.createEvent( 'Events' );
       ev.initEvent( 'webdav_open', true, true );
@@ -881,49 +900,51 @@
       return false;
     },
 
+    // Start Office app by using ActiveX
+    // see http://msdn.microsoft.com/de-de/library/ie/7sw4ddf8(v=vs.94).aspx
+    // IE only
     webdavInvokeIE: function( officeComponent, url ) {
       if ( typeof(ActiveXObject) != "undefined" ) {
         var parts = officeComponent.split( '.' );
-        var launcher = new ActiveXObject( parts[0] + '.Application' );
-        var docType = null;
-        if ( launcher != null ) {
-          docType = launcher[parts[1]];
-        }
 
-        if ( docType != null ) {
+        // Fix object class for MS Project
+        // DO NOT CHANGE the term Project to MSProject within Config.spec due to the fact
+        // that the context menu action strings are built from the object class
+        // identifiers (e.g. Open in Word/Excel/Visio/Project...)
+        if ( parts[0] == 'Project' ) parts[0] = 'MSProject';
+        var launcher = new ActiveXObject( parts[0] + '.Application' );
+
+        if ( parts[0] == 'MSProject' ) {
+          launcher.Application.FileOpen( url, false );
           launcher.Visible = true;
-          docType.Open( url );
+        } else {
+          var docType = null;
+          if ( launcher != null ) {
+            docType = launcher[parts[1]];
+          }
+
+          if ( docType != null ) {
+            launcher.Visible = true;
+            docType.Open( url );
+          }
         }
       }
 
-      return false;
+      return event.preventDefault;
     }
   });
 
   $(document).ready( function() {
-    // Testing
-    var imgs = $('img.modacBookmarkStar');
-    $.each( imgs, function( index, img ) {
-      var goldPattern = /gold/;
-      var src = $(img).attr( 'src' );
-      var newSrc = '/pub/System/ModacContextMenuPlugin/images/star_{0}.png';
-      newSrc = $(this).formatString( newSrc, goldPattern.test( src ) ? 'remove' : 'add' );
-      $(img).on( 'mouseenter', function() {
-        $(img).attr( 'src', newSrc );
-      });
-
-      $(img).on( 'mouseleave', function() {
-        $(img).attr( 'src', src );
-      });
-    });
-    // Testing
-
     var prefs = foswiki.getPreference( 'contextMenu' );
+    // Tribute to VirtualHostingContrib ;)
+    // Required, otherwise all virtual hosts would be forced to use the context menu.
     if ( !prefs.useContextMenu ) return;
 
     var container = $('div.foswikiAttachments');
     if ( $(container).length == 0 ) return;
 
+    // Attach an invisible container.
+    // Used to notify the FF addon (you cannot fire an event for a virtual element)
     if ( $.browser.mozilla ) {
       $(this).checkFirefoxAddOn();
       var body = $('body');
