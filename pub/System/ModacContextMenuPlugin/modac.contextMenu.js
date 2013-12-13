@@ -914,19 +914,30 @@
         if ( parts[0] == 'Project' ) parts[0] = 'MSProject';
         var launcher = new ActiveXObject( parts[0] + '.Application' );
 
-        if ( parts[0] == 'MSProject' ) {
-          launcher.Application.FileOpen( url, false );
-          launcher.Visible = true;
-        } else {
-          var docType = null;
-          if ( launcher != null ) {
-            docType = launcher[parts[1]];
-          }
-
-          if ( docType != null ) {
+        switch ( parts[0] ) {
+          case 'Access':
+            // launcher.OpenAccessProject( url, false );
+            launcher.OpenCurrentDatabase( url, false );
             launcher.Visible = true;
-            docType.Open( url );
-          }
+            break;
+          case 'MSProject':
+            launcher.Application.FileOpen( url, false );
+            launcher.Visible = true;
+            break;
+          case 'Publisher':
+            launcher.Open( url, false );
+            launcher.ActiveWindow.Visible = true;
+            break;
+          default:
+            var docType = null;
+            if ( launcher != null ) {
+              docType = launcher[parts[1]];
+            }
+
+            if ( docType != null ) {
+              launcher.Visible = true;
+              docType.Open( url );
+            }
         }
       }
 
