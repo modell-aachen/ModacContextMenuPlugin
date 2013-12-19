@@ -2,27 +2,25 @@
 #---++ ModacContextMenuPlugin
 
 # **BOOLEAN**
-# Toggle ContextMenu
+# Enable usage of context menu explicitly - required to support VirtualHostingContrib
 $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{UseContextMenu} = 0;
 
 # **BOOLEAN**
-# Whether WebDAV should be enabled or not
+# Check this to enable WebDAV support. Requires WebDAVContrib
 $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{WebDAVEnabled} = 0;
 
 # **STRING**
-# Location for which the webserver exports the WebDAV extension
+# Relative path to the WebDAV root of this wiki instance.
 $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{WebDAVLocation} = '/bin/dav';
 
 # **PERL**
-# Filename extensions that can be used with different
-# Microsoft Office applications. Each key in this hash is the name of an
-# <a href="http://msdn.microsoft.com/en-us/library/bb726436.aspx">)
-# Office 2007 application object class</a>, followed by a full stop and the
-# name of the collection field on that type of application, and maps to
-# a string containing a perl regular expression used to match the file
-# extensions for this application.
+# Mapping of file extensions and their according MS Office application object class.
 $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{WebDAVApps} = {
-    'Word.Documents' => 'doc|docx|docm|dot|dotm|dotx',
-    'PowerPoint.Presentations' => 'ppt|pptx|pptm|pot|potx|potm|ppam|ppsx|ppsm|sldx|sldm|thmx',
-    'Excel.Workbooks' => 'xls|xlsx|xlsm|xlt|xltx|xltm|xlsb|xlam'
+    'Access.Databases' => 'accdb|accdc|accde|accdr|accdt|accdu|accdw|accft|ade|adn|adp|mad|maf|mag|mam|maq|mar|mas|mat|mau|mav|maw|mdb|mde|mdn|mdt|mdw',
+    'Word.Documents' => 'doc|docx|docm|dot|dotm|dotx|rtf',
+    'PowerPoint.Presentations' => 'ppt|pptx|pptm|pot|potx|potm|pps|ppsx|ppsm|sldx|sldm|thm|thmx',
+    'Excel.Workbooks' => 'xls|xlsx|xlsm|xlt|xltx|xltm|xlsb|csv|xld|xlm|xlshtml|xlw|xlxml|xlthtml',
+    'Visio.Documents' => 'vdw|vdx|vsd|vsdm|vsdx|vss|vssm|vst|vstm|vstx|vsu|vsw|vsx|vtx',
+    'Publisher.Documents' => 'pub',
+    'Project.Ignored' => 'mpd|mpp|mpt|mpw|mpx'
 };
