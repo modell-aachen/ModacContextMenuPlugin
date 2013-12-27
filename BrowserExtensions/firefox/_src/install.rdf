@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+  <Description about="urn:mozilla:install-manifest">
+    <em:id>msolink@modell-aachen.de</em:id>
+    <em:version>1.1.0</em:version>
+  <em:type>2</em:type>
+  <em:unpack>true</em:unpack>
+  <em:name>Q.Wiki: MS Office Link</em:name>
+  <em:description>Enables direct editing functionality for Microsoft Office documents.</em:description>
+  <em:homepageURL>http://www.modell-aachen.de</em:homepageURL>
+  <em:creator>Modell Aachen GmbH</em:creator>
+  <em:contributor>Modell Aachen GmbH</em:contributor>
+    <em:iconURL>chrome://msolink/skin/icon.png</em:iconURL>
+  <em:targetPlatform>WINNT</em:targetPlatform>
+  <em:optionsURL>chrome://msolink/content/preferences.xul</em:optionsURL>
+  <em:optionsType>2</em:optionsType>
+  <em:localized>
+    <Description>
+      <em:locale>de</em:locale>
+      <em:name>Q.Wiki: MS Office Anbindung</em:name>
+      <em:description>Ermöglicht das direkte Bearbeiten von Microsoft Office Dokumenten.</em:description>
+      <em:homepageURL>http://www.modell-aachen.de</em:homepageURL>
+      <em:creator>Modell Aachen GmbH</em:creator>
+    </Description>
+  </em:localized>
+    <em:targetApplication>
+      <Description>
+        <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+        <em:minVersion>7.0</em:minVersion>
+        <em:maxVersion>29.0</em:maxVersion>
+      </Description>
+    </em:targetApplication>
+  </Description>
+</RDF>

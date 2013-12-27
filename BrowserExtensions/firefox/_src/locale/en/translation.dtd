@@ -1,0 +1,2 @@
+﻿<!ENTITY msolinkdebug_title "Debug">
+<!ENTITY msolink.debug_desc "Write debug output to Firefox's error console.">

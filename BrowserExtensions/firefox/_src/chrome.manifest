@@ -1,0 +1,6 @@
+content   msolink   chrome/content/
+content   msolink   chrome/content/   contentaccessible=yes
+skin    msolink   classic/1.0     skin/
+overlay   chrome://browser/content/browser.xul    chrome://msolink/content/browser.xul
+locale    msolink   de          locale/de/
+locale    msolink   en          locale/en/
