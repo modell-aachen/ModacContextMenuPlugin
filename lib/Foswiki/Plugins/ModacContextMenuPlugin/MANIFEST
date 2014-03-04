@@ -1,30 +1,24 @@
 !noci
 
-lib/Foswiki/Plugins/ModacContextMenuPlugin.pm 0444
-lib/Foswiki/Plugins/ModacContextMenuPlugin/Config.spec 0444
-
-pub/System/ModacContextMenuPlugin/lang/de.js 0444
-pub/System/ModacContextMenuPlugin/lang/en.js 0444
-
-pub/System/ModacContextMenuPlugin/jquery.contextMenu.js 0444
-pub/System/ModacContextMenuPlugin/jquery.contextMenu.css 0444
-pub/System/ModacContextMenuPlugin/jquery.ui.position.js 0444
-pub/System/ModacContextMenuPlugin/modac.contextMenu.js 0444
-
-pub/System/ModacContextMenuPlugin/images/comment.png 0444
-pub/System/ModacContextMenuPlugin/images/download.png 0444
-pub/System/ModacContextMenuPlugin/images/delete.png 0444
-pub/System/ModacContextMenuPlugin/images/edit.png 0444
-pub/System/ModacContextMenuPlugin/images/locked.png 0444
-pub/System/ModacContextMenuPlugin/images/move.png 0444
-pub/System/ModacContextMenuPlugin/images/rename.png 0444
-pub/System/ModacContextMenuPlugin/images/upload.png 0444
-pub/System/ModacContextMenuPlugin/images/versions.png 0444
-
-pub/System/ModacContextMenuPlugin/images/ajax-loader.gif 0444
-pub/System/ModacContextMenuPlugin/images/star_add.png 0444
-pub/System/ModacContextMenuPlugin/images/star_remove.png 0444
-
-templates/attachtables.contextmenu.tmpl
-
-data/System/ModacContextMenuPlugin.txt 0444
+lib/Foswiki/Plugins/ModacContextMenuPlugin.pm 0644
+lib/Foswiki/Plugins/ModacContextMenuPlugin/Config.spec 0644
+pub/System/ModacContextMenuPlugin/lang/de.js 0644
+pub/System/ModacContextMenuPlugin/lang/en.js 0644
+pub/System/ModacContextMenuPlugin/jquery.contextMenu.js 0644
+pub/System/ModacContextMenuPlugin/jquery.contextMenu.css 0644
+pub/System/ModacContextMenuPlugin/jquery.ui.position.js 0644
+pub/System/ModacContextMenuPlugin/modac.contextMenu.js 0644
+pub/System/ModacContextMenuPlugin/images/comment.png 0644
+pub/System/ModacContextMenuPlugin/images/download.png 0644
+pub/System/ModacContextMenuPlugin/images/delete.png 0644
+pub/System/ModacContextMenuPlugin/images/edit.png 0644
+pub/System/ModacContextMenuPlugin/images/locked.png 0644
+pub/System/ModacContextMenuPlugin/images/move.png 0644
+pub/System/ModacContextMenuPlugin/images/rename.png 0644
+pub/System/ModacContextMenuPlugin/images/upload.png 0644
+pub/System/ModacContextMenuPlugin/images/versions.png 0644
+pub/System/ModacContextMenuPlugin/images/ajax-loader.gif 0644
+pub/System/ModacContextMenuPlugin/images/star_add.png 0644
+pub/System/ModacContextMenuPlugin/images/star_remove.png 0644
+templates/attachtables.contextmenu.tmpl 0644
+data/System/ModacContextMenuPlugin.txt 0644
