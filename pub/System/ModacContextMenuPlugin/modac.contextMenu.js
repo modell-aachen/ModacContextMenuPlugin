@@ -77,6 +77,7 @@
             icon: 'edit',
             disabled: !isEditEnabled,
             callback: function( key, opts ) {
+              if ( window.kvpDiscussionConfirmation && !window.kvpDiscussionConfirmation() ) return false;
               if ( $.browser.msie ) {
                 return $(this).webdavInvokeIE( component, davHref );
               }
@@ -115,6 +116,7 @@
             icon: 'newversion',
             disabled: !kvpCanEdit,
             callback: function( key, opts ){
+              if ( window.kvpDiscussionConfirmation && !window.kvpDiscussionConfirmation() ) return false;
               var attachUrl = $(this).formatString(
                 "{0}/attach{1}/{2}/{3}?filename={4}",
                 binPath,
