@@ -17,9 +17,6 @@ our $NO_PREFS_IN_TOPIC = 1;
 sub initPlugin {
   my ( $topic, $web, $user, $installWeb ) = @_;
 
-  my $context = Foswiki::Func::getContext();
-  return 1 unless $context->{'view'};
-
   if ( $Foswiki::Plugins::VERSION < 2.0 ) {
     Foswiki::Func::writeWarning(
       'Version mismatch between ',
