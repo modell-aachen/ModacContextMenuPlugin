@@ -76,10 +76,15 @@ var ContextMenu = function() {
     });
   };
 
-  var buildRegularMenu = function( defaultItems ) {
+  var buildRegularMenu = function( defaultItems, kvpCanEdit ) {
     var items = defaultItems.slice();
     for ( var i = 0; i < entries.length; ++i ) {
       var entry = entries[i];
+
+      if ( typeof( entry.data ) == 'object' && entry.opts.honorsKVP ) {
+        entry.data.disabled = !kvpCanEdit;
+      }
+
       items.splice( entry.opts.position, 0, entry.data );
     }
 
@@ -89,12 +94,31 @@ var ContextMenu = function() {
       regularMenu[i] = entry;
     }
 
-    console.log( regularMenu );
-
     return regularMenu;
   };
 
-  var buildLockedMenu = function() {};
+  var buildLockedMenu = function( lockedItems, locked ) {
+    var items = lockedItems.slice();
+
+    var lockableEntries = entries.slice();
+    for ( var i = 0; i < lockableEntries.length; ++i ) {
+      var entry = lockableEntries[i];
+
+      if ( locked && typeof( entry.data ) == 'object' && entry.opts.lockable ) {
+        entry.data.disabled = true;
+      }
+
+      items.splice( entry.opts.position, 0, entry.data );
+    }
+
+    var lockedMenu = {};
+    for ( var i = 0; i < items.length; ++i ) {
+      var entry = items[i];
+      lockedMenu[i] = entry;
+    }
+
+    return lockedMenu;
+  };
 
   // tries to access a public resource of FF's qwiki-webdav addon.
   // will fail when not available (not installed, not FF at all)
@@ -346,11 +370,13 @@ var ContextMenu = function() {
       davHref = davHref.replace( pubPath, davUrl );
     }
 
+    /*
+     * regular menu
+     */
     var edit = {
       name: isEditEnabled
         ? formatString( lang.editAttachmentIn, componentName )
         : lang.editAttachment,
-      // name: function() { return "foobar"; },
       icon: 'edit',
       disabled: !isEditEnabled,
       callback: function( key, opts ) {
@@ -383,8 +409,6 @@ var ContextMenu = function() {
       name: lang.downloadAttachment,
       icon: 'download',
       callback: function( key, opts ) {
-        console.log( href );
-        return;
         window.location.href = href;
       }
     };
@@ -395,7 +419,7 @@ var ContextMenu = function() {
       disabled: !kvpCanEdit,
       callback: function( key, opts ){
         if ( window.kvpDiscussionConfirmation && !window.kvpDiscussionConfirmation() ) return false;
-        var attachUrl = $(this).formatString(
+        var attachUrl = formatString(
           "{0}/attach{1}/{2}/{3}?filename={4}",
           binPath,
           scriptSuffix,
@@ -802,133 +826,141 @@ var ContextMenu = function() {
       comment
     ];
 
-    // defines a less functionaly menu (used for locked files)
-    var lockedMenu = {
-      className: 'data-title',
-      items: {
-        'edit': {
-          name: hasHandler
-                  ? formatString( lang.editAttachmentIn, componentName )
-                  : lang.editAttachment,
-          icon: 'locked',
-          disabled: true
-        },
 
-        'download': {
-          name: lang.downloadAttachment,
-          icon: 'download',
-          callback: function( key, opts ) {
-            window.location.href = href;
-          }
-        },
+    /*
+     * locked menu
+     */
+    var editLocked = {
+      name: hasHandler
+        ? formatString( lang.editAttachmentIn, componentName )
+        : lang.editAttachment,
+      icon: 'locked',
+      disabled: true
+    };
 
-        sep1: "---------",
-
-        'newversion': {
-          name: lang.newVersion,
-          disabled: true,
-          icon: 'locked'
-        },
-
-        'versions': {
-          name: lang.manageVersions,
-          disabled: true,
-          icon: 'locked'
-        },
-
-        sep2: "---------",
-
-        'move': {
-          name: lang.moveAttachment,
-          disabled: true,
-          icon: 'locked'
-        },
-
-        'rename': {
-          name: lang.renameAttachment,
-          disabled: true,
-          icon: 'locked'
-        },
-
-        'delete': {
-          name: lang.deleteAttachment,
-          disabled: true,
-          icon: 'locked'
-        },
-
-        sep3: "---------",
-
-        'comment': {
-          name: lang.editComment,
-          icon: 'comment',
-          disabled: !kvpCanEdit,
-          callback: function( key, opts ){
-            var attachUrl = formatString(
-              "{0}/attach{1}/{2}/{3}?filename={4}",
-              binPath,
-              scriptSuffix,
-              web,
-              topic,
-              filename
-            );
-
-            blockUI();
-            $.ajax({
-              url: attachUrl,
-              complete: function( xhr, status ) {
-                $.unblockUI();
-              },
-              error: function( xhr, status, error ) {
-                createErrorDialog();
-                console.log( error );
-              },
-              success: function( page, status, xhr ) {
-                if ( isLoginForm( page ) ) return;
-                var form = $(page).find('form.modacUpload');
-                $(form).find('div.patternBorder').hide();
-                var steps = $(form).find('div.foswikiFormSteps').children();
-                $(steps).first().hide();
-                $(steps).last().hide();
-                var d = $('<div></div>');
-                $(form).appendTo( d );
-
-                $(d).dialog({
-                  title: lang.editCommentDialogTitle,
-                  closeOnEscape: true,
-                  modal: true,
-                  minWidth: 600,
-                  minHeight: 150,
-                  show: {
-                    effect: 'fade',
-                    duration: 500
-                  },
-                  hide: {
-                    effect: 'fade',
-                    duration: 300
-                  },
-                  buttons: [
-                    {
-                      text: lang.btnSaveText,
-                      click: function() {
-                        $(d).find('input.modacChanging').click();
-                        $(this).dialog('close');
-                      }
-                    },
-                    {
-                      text: lang.btnCancelText,
-                      click: function() {
-                        $(this).dialog('close');
-                      }
-                    }
-                  ]
-                });
-              }
-            });
-          }
-        }
+    var downloadLocked = {
+      name: lang.downloadAttachment,
+      icon: 'download',
+      callback: function( key, opts ) {
+        window.location.href = href;
       }
     };
 
+    var newversionLocked = {
+      name: lang.newVersion,
+      disabled: true,
+      icon: 'locked'
+    };
+
+    var versionsLocked = {
+      name: lang.manageVersions,
+      disabled: true,
+      icon: 'locked'
+    };
+
+    var moveLocked = {
+      name: lang.moveAttachment,
+      disabled: true,
+      icon: 'locked'
+    };
+
+    var renameLocked = {
+      name: lang.renameAttachment,
+      disabled: true,
+      icon: 'locked'
+    };
+
+    var deleteLocked = {
+      name: lang.deleteAttachment,
+      disabled: true,
+      icon: 'locked'
+    };
+
+    var commentLocked = {
+      name: lang.editComment,
+      icon: 'comment',
+      disabled: !kvpCanEdit,
+      callback: function( key, opts ){
+        var attachUrl = formatString(
+          "{0}/attach{1}/{2}/{3}?filename={4}",
+          binPath,
+          scriptSuffix,
+          web,
+          topic,
+          filename
+        );
+
+        blockUI();
+        $.ajax({
+          url: attachUrl,
+          complete: function( xhr, status ) {
+            $.unblockUI();
+          },
+          error: function( xhr, status, error ) {
+            createErrorDialog();
+            console.log( error );
+          },
+          success: function( page, status, xhr ) {
+            if ( isLoginForm( page ) ) return;
+            var form = $(page).find('form.modacUpload');
+            $(form).find('div.patternBorder').hide();
+            var steps = $(form).find('div.foswikiFormSteps').children();
+            $(steps).first().hide();
+            $(steps).last().hide();
+            var d = $('<div></div>');
+            $(form).appendTo( d );
+
+            $(d).dialog({
+              title: lang.editCommentDialogTitle,
+              closeOnEscape: true,
+              modal: true,
+              minWidth: 600,
+              minHeight: 150,
+              show: {
+                effect: 'fade',
+                duration: 500
+              },
+              hide: {
+                effect: 'fade',
+                duration: 300
+              },
+              buttons: [
+                {
+                  text: lang.btnSaveText,
+                  click: function() {
+                    $(d).find('input.modacChanging').click();
+                    $(this).dialog('close');
+                  }
+                },
+                {
+                  text: lang.btnCancelText,
+                  click: function() {
+                    $(this).dialog('close');
+                  }
+                }
+              ]
+            });
+          }
+        });
+      }
+    }
+
+    var lockedItems = [
+      editLocked,
+      downloadLocked,
+      '---------',
+      newversionLocked,
+      versionsLocked,
+      '---------',
+      moveLocked,
+      renameLocked,
+      deleteLocked,
+      '---------',
+      commentLocked
+    ];
+
+
+    // build the context menu each time the user clicks an (attachtable) entry.
     $this.contextMenu({
       selector: 'a',
       trigger: 'left',
@@ -961,9 +993,9 @@ var ContextMenu = function() {
 
         $(icon).attr( 'src', origSrc );
 
-        // var locked = {items:buildLockedMenu()};
-        var regular = {items: buildRegularMenu( defaultItems )};
-        return response.isLocked ? lockedMenu : regular;
+        var regular = {items: buildRegularMenu( defaultItems, kvpCanEdit )};
+        var locked = {className: 'data-title', items: buildLockedMenu( lockedItems, response.isLocked )};
+        return response.isLocked ? locked : regular;
       }
     });
   };
