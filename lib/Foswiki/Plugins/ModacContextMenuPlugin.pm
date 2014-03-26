@@ -17,6 +17,9 @@ our $NO_PREFS_IN_TOPIC = 1;
 sub initPlugin {
   my ( $topic, $web, $user, $installWeb ) = @_;
 
+  my $context = Foswiki::Func::getContext();
+  return 1 unless $context->{'view'};
+
   if ( $Foswiki::Plugins::VERSION < 2.0 ) {
     Foswiki::Func::writeWarning(
       'Version mismatch between ',
@@ -185,11 +188,7 @@ sub _getWebDAVUrl {
 __END__
 Foswiki - The Free and Open Source Wiki, http://foswiki.org/
 
-Author: Sven Meyer <meyer@modell-aachen.de>
-
-Copyright (C) 2008-2013 Foswiki Contributors. Foswiki Contributors
-are listed in the AUTHORS file in the root of this distribution.
-NOTE: Please extend that file, not this notice.
+Copyright (C) 2013 Modell Aachen GmbH
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
