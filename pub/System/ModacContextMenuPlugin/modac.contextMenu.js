@@ -1,6 +1,6 @@
 var ContextMenu = function() {
   if ( !window.foswiki.ModacContextMenuPluginLang ) {
-    console.log( 'No language specified.' );
+    window.console && console.log( 'No language specified.' );
     return;
   }
 
@@ -436,7 +436,7 @@ var ContextMenu = function() {
           },
           error: function( xhr, status, error ) {
             createErrorDialog();
-            console.log( error );
+            window.console && console.log( error );
           },
           success: function( page, status, xhr ) {
             if ( isLoginForm( page ) ) return;
@@ -562,7 +562,7 @@ var ContextMenu = function() {
           },
           error: function( xhr, status, error ) {
             createErrorDialog();
-            console.log( error );
+            window.console && console.log( error );
           },
           success: function( page, status, xhr ) {
             if ( isLoginForm( page ) ) return;
@@ -629,7 +629,7 @@ var ContextMenu = function() {
           },
           error: function( xhr, status, error ) {
             createErrorDialog();
-            console.log( error );
+            window.console && console.log( error );
           },
           success: function( page, status, xhr ) {
             if ( isLoginForm( page ) ) return;
@@ -699,7 +699,7 @@ var ContextMenu = function() {
           },
           error: function( xhr, status, error ) {
             createErrorDialog();
-            console.log( error );
+            window.console && console.log( error );
           },
           success: function( page, status, xhr ) {
             if ( isLoginForm( page ) ) return;
@@ -765,7 +765,7 @@ var ContextMenu = function() {
           },
           error: function( xhr, status, error ) {
             createErrorDialog();
-            console.log( error );
+            window.console && console.log( error );
           },
           success: function( page, status, xhr ) {
             if ( isLoginForm( page ) ) return;
@@ -898,7 +898,7 @@ var ContextMenu = function() {
           },
           error: function( xhr, status, error ) {
             createErrorDialog();
-            console.log( error );
+            window.console && console.log( error );
           },
           success: function( page, status, xhr ) {
             if ( isLoginForm( page ) ) return;
