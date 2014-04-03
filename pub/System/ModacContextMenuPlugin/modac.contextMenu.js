@@ -1,6 +1,6 @@
 var ContextMenu = function() {
   if ( !window.foswiki.ModacContextMenuPluginLang ) {
-    window.console && console.log( 'No language specified.' );
+    // window.console && console.log( 'No language specified.' );
     return;
   }
 
