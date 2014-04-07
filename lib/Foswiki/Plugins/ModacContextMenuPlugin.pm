@@ -142,13 +142,15 @@ sub _attachPrefs {
   my $davPrefs = "\"davIsEnabled\": 0";
   # double checked in order to support virtual hosting.
   if ( $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{WebDAVEnabled} ) {
-    my $server = $Foswiki::cfg{DefaultUrlHost};
     my $hasLocation = 1;
     my $location = $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{WebDAVLocation} || "";
     unless ( $location ) {
       Foswiki::Func::writeWarning( "No WebDAV location specified (in Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{WebDAVLocation})." );
       $hasLocation = 0;
     }
+
+    my $session = $Foswiki::Plugins::SESSION;
+    my $server = $session->{urlHost};
 
     my $davUrl = Foswiki::urlEncode( $server . $location );
     my $cfgApps = $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{WebDAVApps} || '';
@@ -173,7 +175,8 @@ sub _getLockDb {
 }
 
 sub _getWebDAVUrl {
-  my $server = $Foswiki::cfg{DefaultUrlHost};
+  my $session = $Foswiki::Plugins::SESSION;
+  my $server = $session->{urlHost};
   my $location = $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{WebDAVLocation};
   $location =~ s/\/*$//;
   $server =~ s/\/*$//;
