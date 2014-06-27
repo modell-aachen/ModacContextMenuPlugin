@@ -59,7 +59,7 @@ var ContextMenu = function() {
 
   var isSupportedBrowser = function() {
     var hasActiveX = typeof(ActiveXObject) != "undefined";
-    var isSupported = isFirefox || (isIE && hasActiveX);
+    var isSupported = isChrome || isFirefox || (isIE && hasActiveX);
     return isSupported;
   };
 
@@ -265,7 +265,7 @@ var ContextMenu = function() {
   // fires an event (which will be handled by qwiki-webdav addon)
   // in order to launch Office
   // Mozilla only
-  var webdavInvokeFF = function( e ) {
+  var webdavInvoke = function( e ) {
     var ev = document.createEvent( 'Events' );
     ev.initEvent( 'webdav_open', true, true );
     e.currentTarget.dispatchEvent( ev );
@@ -385,8 +385,8 @@ var ContextMenu = function() {
           return webdavInvokeIE( component, davHref );
         }
 
-        if ( isFirefox ) {
-          if ( !foswiki.hasFFAddon ) {
+        if ( isFirefox || isChrome ) {
+          if ( isFirefox && !foswiki.hasFFAddon ) {
             createFirefoxAddonDialog();
             return;
           }
@@ -397,7 +397,7 @@ var ContextMenu = function() {
           div.appendChild( a );
 
           a.onclick = function( e ) {
-            return webdavInvokeFF( e );
+            return webdavInvoke( e );
           };
 
           a.click();
@@ -1011,12 +1011,12 @@ var ContextMenu = function() {
     return null;
   };
 
-
-
-  if ( isFirefox ) {
+  if ( isChrome || isFirefox ) {
     // Attach an invisible container.
     // Used to notify the FF addon (you cannot fire an event for a virtual element)
-    checkFirefoxAddOn();
+    if ( isFirefox )
+      checkFirefoxAddOn();
+
     var hidden = '<div id="hiddenContainer" style="display:none;"></div>';
     $(hidden).appendTo('body');
   }
