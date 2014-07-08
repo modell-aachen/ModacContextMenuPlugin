@@ -59,7 +59,8 @@ var ContextMenu = function() {
 
   var isSupportedBrowser = function() {
     var hasActiveX = typeof(ActiveXObject) != "undefined";
-    var isSupported = isChrome || isFirefox || (isIE && hasActiveX);
+    // var isSupported = isChrome || isFirefox || (isIE && hasActiveX);
+    var isSupported = isFirefox || (isIE && hasActiveX);
     return isSupported;
   };
 
