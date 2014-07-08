@@ -276,7 +276,7 @@ var ContextMenu = function() {
   // Start Office app by using ActiveX
   // see http://msdn.microsoft.com/de-de/library/ie/7sw4ddf8(v=vs.94).aspx
   // IE only
-  var webdavInvokeIE = function( officeComponent, url ) {
+  var webdavInvokeIE = function( officeComponent, url, isTemplate ) {
     if ( typeof(ActiveXObject) != "undefined" ) {
       var parts = officeComponent.split( '.' );
 
@@ -308,8 +308,14 @@ var ContextMenu = function() {
           }
 
           if ( docType != null ) {
+            if ( isTemplate ) {
+              docType.Add( url );
+              // docType.Application.ActiveDocument.SaveAs( "http://qwiki-dev/bin/dav/Main/WebHome_files/cvb.docx" );
+            } else {
+              docType.Open( url );
+            }
+
             launcher.Visible = true;
-            docType.Open( url );
           }
       }
     }
@@ -321,7 +327,7 @@ var ContextMenu = function() {
     var options = {
       honorsKVP: true,
       lockable: true,
-      position: 11 + entries.length // there are 11 default items.
+      position: 13 + entries.length // there are 13 default items.
     };
 
     if ( !opts ) opts = {};
@@ -347,15 +353,29 @@ var ContextMenu = function() {
     }
 
     var hasHandler = false;
-    var component, componentName;
+    var component, componentName, extension;
     for ( var app in apps ) {
       var exts = new RegExp( "\\.(" + apps[app] + ")$" );
       if ( exts.test( href ) ) {
         hasHandler = true;
         componentName = app.split( '.' )[0];
         component = app;
+
+        try {
+          extension = href.match( exts )[1];
+        } catch ( e ) {
+          extension = null;
+        }
+
         break;
       }
+    }
+
+    // check whether the currently processed file refers to an office template.
+    var isTemplate = false;
+    if ( hasHandler && extension ) {
+      var templates = new RegExp("^(dot|dotm|dotx|pot|potm|potx|xlt|xltm|xltx|vst|vstm|vstx)$" );
+      isTemplate = templates.test( extension );
     }
 
     var isEditEnabled = davEnabledBrowser
@@ -383,7 +403,7 @@ var ContextMenu = function() {
       callback: function( key, opts ) {
         if ( window.kvpDiscussionConfirmation && !window.kvpDiscussionConfirmation() ) return false;
         if ( isIE ) {
-          return webdavInvokeIE( component, davHref );
+          return webdavInvokeIE( component, davHref, false );
         }
 
         if ( isFirefox || isChrome ) {
@@ -403,6 +423,15 @@ var ContextMenu = function() {
 
           a.click();
         }
+      }
+    };
+
+    var fromTemplate = {
+      name: lang.useAsTemplate,
+      icon: 'template',
+      disabled: !(isTemplate && isIE),
+      callback: function( key, opts ) {
+        return webdavInvokeIE( component, davHref, true );
       }
     };
 
@@ -815,6 +844,8 @@ var ContextMenu = function() {
 
     var defaultItems = [
       edit,
+      fromTemplate,
+      '---------',
       download,
       '---------',
       newversion,
@@ -948,6 +979,8 @@ var ContextMenu = function() {
 
     var lockedItems = [
       editLocked,
+      fromTemplate,
+      '---------',
       downloadLocked,
       '---------',
       newversionLocked,

@@ -97,6 +97,7 @@
 }
 
 .context-menu-item.icon-download { background-image: url(images/download.png); }
+.context-menu-item.icon-template { background-image: url(images/template.png); }
 .context-menu-item.icon-edit { background-image: url(images/edit.png); }
 .context-menu-item.icon-locked { background-image: url(images/locked.png); }
 .context-menu-item.icon-versions { background-image: url(images/versions.png); }

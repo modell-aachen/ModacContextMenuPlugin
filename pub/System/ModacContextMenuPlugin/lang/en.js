@@ -16,6 +16,7 @@
       lockedBy: 'Locked by {0}',
       editAttachment: 'Edit attachment',
       editAttachmentIn: 'Edit in {0}',
+      useAsTemplate: 'Use as template',
       downloadAttachment: 'Open a copy',
       newVersion: 'Upload new version',
       newVersionDialogTitle: 'Update attachment',

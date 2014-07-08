@@ -16,6 +16,7 @@
       lockedBy: 'Gesperrt von {0}',
       editAttachment: 'Datei bearbeiten',
       editAttachmentIn: 'In {0} bearbeiten',
+      useAsTemplate: 'Als Vorlage verwenden',
       downloadAttachment: 'Kopie &ouml;ffnen',
       newVersion: 'Neue Version hochladen',
       newVersionDialogTitle: 'Anhang aktualisieren',
