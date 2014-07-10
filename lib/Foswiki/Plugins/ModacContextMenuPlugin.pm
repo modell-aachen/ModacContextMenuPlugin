@@ -161,10 +161,11 @@ sub _attachPrefs {
 
   my $kvpPrefs = "\"kvpIsEnabled\": $kvpEnabled, \"kvpCanEdit\": $kvpCanEdit, \"kvpCanMove\": $kvpCanMove";
   my $menuIsEnabled = $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{UseContextMenu} || 0;
+  my $topicInteraction = $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{TopicInteraction} || 0;
   Foswiki::Func::addToZone(
     "script",
     "MODACCONTEXTMENUPLUGIN",
-    "<script type='text/javascript'>jQuery.extend( foswiki.preferences, { \"contextMenu\": { $kvpPrefs, $davPrefs, \"trashWeb\": \"%TRASHWEB%\", \"useContextMenu\": $menuIsEnabled } } );</script>",
+    "<script type='text/javascript'>jQuery.extend( foswiki.preferences, { \"contextMenu\": { $kvpPrefs, $davPrefs, \"trashWeb\": \"%TRASHWEB%\", \"useContextMenu\": $menuIsEnabled, \"useTopicInteraction\": $topicInteraction } } );</script>",
     "JQUERYPLUGIN::FOSWIKI::PREFERENCES" );
 }
 

@@ -6,6 +6,10 @@
 $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{UseContextMenu} = 0;
 
 # **BOOLEAN**
+# Enable integration for TopicInteractionPlugin
+$Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{TopicInteraction} = 0;
+
+# **BOOLEAN**
 # Check this to enable WebDAV support. Requires WebDAVContrib
 $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{WebDAVEnabled} = 0;
 
