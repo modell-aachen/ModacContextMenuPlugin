@@ -349,7 +349,7 @@ var ContextMenu = function() {
         var hasHandler = false;
         var component, componentName, extension;
         for (var app in apps) {
-            var exts = new RegExp("\\.(" + apps[app] + ")$");
+            var exts = new RegExp("\\.(" + apps[app] + ")$", 'i');
             if (exts.test(href)) {
                 hasHandler = true;
                 componentName = app.split('.')[0];
@@ -368,7 +368,7 @@ var ContextMenu = function() {
         // check whether the currently processed file refers to an office template.
         var isTemplate = false;
         if (hasHandler && extension) {
-            var templates = new RegExp("^(dot|dotm|dotx|pot|potm|potx|xlt|xltm|xltx|vst|vstm|vstx)$");
+            var templates = new RegExp("^(dot|dotm|dotx|pot|potm|potx|xlt|xltm|xltx|vst|vstm|vstx)$", 'i');
             isTemplate = templates.test(extension);
         }
 
