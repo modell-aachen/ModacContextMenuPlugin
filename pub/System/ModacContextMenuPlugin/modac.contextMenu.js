@@ -280,17 +280,16 @@ var ContextMenu = function() {
 
             switch (parts[0]) {
                 case 'Access':
-                    // launcher.OpenAccessProject( url, false );
-                    launcher.OpenCurrentDatabase(url, false);
                     launcher.Visible = true;
+                    launcher.OpenCurrentDatabase(url, false);
                     break;
                 case 'MSProject':
-                    launcher.Application.FileOpen(url, false);
                     launcher.Visible = true;
+                    launcher.Application.FileOpen(url, false);
                     break;
                 case 'Publisher':
-                    launcher.Open(url, false);
                     launcher.ActiveWindow.Visible = true;
+                    launcher.Open(url, false);
                     break;
                 default:
                     var docType = null;
@@ -299,14 +298,14 @@ var ContextMenu = function() {
                     }
 
                     if (docType != null) {
+                        launcher.Visible = true;
+
                         if (isTemplate) {
                             docType.Add(url);
-                            // docType.Application.ActiveDocument.SaveAs( "http://qwiki-dev/bin/dav/Main/WebHome_files/cvb.docx" );
                         } else {
                             docType.Open(url);
                         }
 
-                        launcher.Visible = true;
                     }
             }
         }
