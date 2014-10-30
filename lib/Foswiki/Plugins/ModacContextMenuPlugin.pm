@@ -6,6 +6,9 @@ use warnings;
 use Foswiki::Func    ();
 use Foswiki::Plugins ();
 
+use Filesys::Virtual::Foswiki;
+use Digest::SHA;
+
 use JSON;
 
 use version;
@@ -32,6 +35,7 @@ sub initPlugin {
 
   # rest handler to interact with FilesysVirtualPlugin
   Foswiki::Func::registerRESTHandler( 'isLocked', \&_restIsLocked );
+  Foswiki::Func::registerRESTHandler( 'tokenizer', \&_restTokenizer );
 
   my $jqAvailable = $Foswiki::cfg{Plugins}{JQueryPlugin}{Enabled};
   unless ( $jqAvailable ) {
@@ -76,6 +80,35 @@ sub _handlePrettyUserTag {
   # ToDo: WikiWord -> Wiki Word
 
   return $wikiWord;
+}
+
+sub _restTokenizer {
+  my ( $session, $subject, $verb, $response ) = @_;
+  my $query = $session->{request};
+
+  my $web = $query->{param}->{w}[0];
+  my $topic = $query->{param}->{t}[0];
+  my $attachment = $query->{param}->{a}[0];
+
+  my $wikiName = Foswiki::Func::getWikiName( $session->{user} );
+  my $guest = $Foswiki::cfg{DefaultUserWikiName} || 'WikiGuest';
+  if ( $wikiName ne $guest ) {
+    my ($w, $t) = Foswiki::Func::normalizeWebTopicName( $web, $topic );
+    my $path = "$w/$t";
+    my %opts = (validateLogin => 0);
+    my $fs = Filesys::Virtual::Foswiki->new(\%opts);
+    my $db = $fs->_locks();
+    my %data = (user => $wikiName, path => $path, file => $attachment);
+    my $token = Digest::SHA::sha1_hex( \%data . rand(1000) );
+    Foswiki::Func::writeWarning( $token );
+    if ( $db->setAuthToken( $token, \%data ) )
+    {
+      $response->pushHeader( 'X-MA-TOKEN', $token );
+    }
+  }
+
+  $response->status(200);
+  return '';
 }
 
 sub _restIsLocked {

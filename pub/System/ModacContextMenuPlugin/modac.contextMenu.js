@@ -371,13 +371,14 @@ var ContextMenu = function() {
             isTemplate = templates.test(extension);
         }
 
-        var isEditEnabled = davEnabledBrowser && hasDavUrl && hasApps && hasHandler && kvpCanEdit;
-
+        var isEditEnabled = davEnabledBrowser && hasApps && kvpCanEdit;
         var davHref = href;
         if (hasDavUrl && hasHandler) {
             var newTopic = topic + '_files'; // hard corded in FilesysVirtual
             davHref = davHref.replace(topic, newTopic);
             davHref = davHref.replace(pubPath, davUrl);
+        } else {
+            isEditEnabled = false;
         }
 
         /*
@@ -389,27 +390,54 @@ var ContextMenu = function() {
             disabled: !isEditEnabled,
             callback: function(key, opts) {
                 if (window.kvpDiscussionConfirmation && !window.kvpDiscussionConfirmation()) return false;
-                if (isIE) {
-                    return webdavInvokeIE(component, davHref, false);
-                }
 
-                if (isFirefox || isChrome) {
-                    if (isFirefox && !foswiki.hasFFAddon) {
-                        createFirefoxAddonDialog();
+                var restUrl = formatString(
+                    "{0}/rest{1}/ModacContextMenuPlugin/tokenizer?w={2}&t={3}&a={4}",
+                    binPath,
+                    scriptSuffix,
+                    web,
+                    topic,
+                    filename
+                );
+
+                $.ajax({url: restUrl}).done(function(data, status, xhr) {
+                    var token = xhr.getResponseHeader('X-MA-TOKEN');
+                    if (!token) {
+                        if (window.console && window.console.error) {
+                            console.error('Missing token!');
+                        }
                         return;
                     }
 
-                    var div = document.getElementById('hiddenContainer');
-                    var a = document.createElement('a');
-                    a.setAttribute('href', davHref);
-                    div.appendChild(a);
+                    davHref = davHref.replace(davUrl, davUrl + '/' + token);
+                    if (isIE) {
+                        return webdavInvokeIE(component, davHref, false);
+                    }
 
-                    a.onclick = function(e) {
-                        return webdavInvoke(e);
-                    };
+                    if (isFirefox || isChrome) {
+                        if (isFirefox && !foswiki.hasFFAddon) {
+                            createFirefoxAddonDialog();
+                            return;
+                        }
 
-                    a.click();
-                }
+                        var div = document.getElementById('hiddenContainer');
+                        var a = document.createElement('a');
+
+                        a.setAttribute('href', davHref);
+                        div.appendChild(a);
+
+                        a.onclick = function(e) {
+                            return webdavInvoke(e);
+                        };
+
+                        a.click();
+                    }
+                }).fail(function(xhr, status, err) {
+                    if (window.console && window.console.error) {
+                        console.error('Acquiring token failed!');
+                        console.error(err);
+                    }
+                });
             }
         };
 
