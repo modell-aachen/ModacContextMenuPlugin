@@ -100,7 +100,6 @@ sub _restTokenizer {
     my $db = $fs->_locks();
     my %data = (user => $wikiName, path => $path, file => $attachment);
     my $token = Digest::SHA::sha1_hex( \%data . rand(1000) );
-    Foswiki::Func::writeWarning( $token );
     if ( $db->setAuthToken( $token, \%data ) )
     {
       $response->pushHeader( 'X-MA-TOKEN', $token );
