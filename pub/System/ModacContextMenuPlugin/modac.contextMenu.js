@@ -367,15 +367,7 @@ var ContextMenu = function() {
             isTemplate = templates.test(extension);
         }
 
-        var isEditEnabled = davEnabledBrowser && hasApps && kvpCanEdit;
-        var davHref = href;
-        if (hasDavUrl && hasHandler) {
-            var newTopic = topic + '_files'; // hard corded in FilesysVirtual
-            davHref = davHref.replace(topic, newTopic);
-            davHref = davHref.replace(pubPath, davUrl);
-        } else {
-            isEditEnabled = false;
-        }
+        var isEditEnabled = davEnabledBrowser && hasApps && kvpCanEdit && hasDavUrl && hasHandler;
 
         /*
          * regular menu
@@ -405,7 +397,9 @@ var ContextMenu = function() {
                         return;
                     }
 
-                    davHref = davHref.replace(davUrl, davUrl + '/' + token);
+                    var newTopic = topic + '_files'; // hard corded in FilesysVirtual
+                    var davHref = href.replace(topic, newTopic).replace(pubPath, davUrl + '/' + token);
+
                     if (isIE) {
                         return webdavInvokeIE(component, davHref, false);
                     }
