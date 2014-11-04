@@ -58,9 +58,7 @@ var ContextMenu = function() {
     var isIE = /MSIE|Trident/.test(navigator.userAgent);
 
     var isSupportedBrowser = function() {
-        var hasActiveX = typeof(ActiveXObject) != "undefined";
-        // var isSupported = isChrome || isFirefox || (isIE && hasActiveX);
-        var isSupported = isFirefox || (isIE && hasActiveX);
+        var isSupported = isFirefox || isIE;
         return isSupported;
     };
 
@@ -268,46 +266,44 @@ var ContextMenu = function() {
     // see http://msdn.microsoft.com/de-de/library/ie/7sw4ddf8(v=vs.94).aspx
     // IE only
     var webdavInvokeIE = function(officeComponent, url, isTemplate) {
-        if (typeof(ActiveXObject) != "undefined") {
-            var parts = officeComponent.split('.');
+        var parts = officeComponent.split('.');
 
-            // Fix object class for MS Project
-            // DO NOT CHANGE the term 'Project' to 'MSProject' within Config.spec!
-            // The context menu action strings are built from the object class
-            // identifiers (e.g. Open in Word/Excel/Visio/Project...)
-            if (parts[0] == 'Project') parts[0] = 'MSProject';
-            var launcher = new ActiveXObject(parts[0] + '.Application');
+        // Fix object class for MS Project
+        // DO NOT CHANGE the term 'Project' to 'MSProject' within Config.spec!
+        // The context menu action strings are built from the object class
+        // identifiers (e.g. Open in Word/Excel/Visio/Project...)
+        if (parts[0] == 'Project') parts[0] = 'MSProject';
+        var launcher = new ActiveXObject(parts[0] + '.Application');
 
-            switch (parts[0]) {
-                case 'Access':
+        switch (parts[0]) {
+            case 'Access':
+                launcher.Visible = true;
+                launcher.OpenCurrentDatabase(url, false);
+                break;
+            case 'MSProject':
+                launcher.Visible = true;
+                launcher.Application.FileOpen(url, false);
+                break;
+            case 'Publisher':
+                launcher.ActiveWindow.Visible = true;
+                launcher.Open(url, false);
+                break;
+            default:
+                var docType = null;
+                if (launcher != null) {
+                    docType = launcher[parts[1]];
+                }
+
+                if (docType != null) {
                     launcher.Visible = true;
-                    launcher.OpenCurrentDatabase(url, false);
-                    break;
-                case 'MSProject':
-                    launcher.Visible = true;
-                    launcher.Application.FileOpen(url, false);
-                    break;
-                case 'Publisher':
-                    launcher.ActiveWindow.Visible = true;
-                    launcher.Open(url, false);
-                    break;
-                default:
-                    var docType = null;
-                    if (launcher != null) {
-                        docType = launcher[parts[1]];
+
+                    if (isTemplate) {
+                        docType.Add(url);
+                    } else {
+                        docType.Open(url);
                     }
 
-                    if (docType != null) {
-                        launcher.Visible = true;
-
-                        if (isTemplate) {
-                            docType.Add(url);
-                        } else {
-                            docType.Open(url);
-                        }
-
-                    }
-            }
+                }
         }
 
         return event.preventDefault;
