@@ -436,8 +436,8 @@ var ContextMenu = function() {
                     "{0}/attach{1}/{2}/{3}?filename={4}",
                     binPath,
                     scriptSuffix,
-                    web,
-                    topic,
+                    encodeURI(web),
+                    encodeURI(topic),
                     filename
                 );
 
@@ -501,8 +501,8 @@ var ContextMenu = function() {
                     "{0}/attach{1}/{2}/{3}?filename={4}",
                     binPath,
                     scriptSuffix,
-                    web,
-                    topic,
+                    encodeURI(web),
+                    encodeURI(topic),
                     filename
                 );
 
@@ -557,8 +557,8 @@ var ContextMenu = function() {
                     "{0}/rename{1}/{2}/{3}?template=moveattachment&attachment={4}",
                     binPath,
                     scriptSuffix,
-                    web,
-                    topic,
+                    encodeURI(web),
+                    encodeURI(topic),
                     filename
                 );
 
@@ -621,8 +621,8 @@ var ContextMenu = function() {
                     "{0}/rename{1}/{2}/{3}?template=moveattachment&attachment={4}",
                     binPath,
                     scriptSuffix,
-                    web,
-                    topic,
+                    encodeURI(web),
+                    encodeURI(topic),
                     filename
                 );
 
@@ -687,8 +687,8 @@ var ContextMenu = function() {
                     "{0}/rename{1}/{2}/{3}?newweb={4};newtopic=TrashAttachment;template=renameattachmentdelete;attachment={5}",
                     binPath,
                     scriptSuffix,
-                    web,
-                    topic,
+                    encodeURI(web),
+                    encodeURI(topic),
                     trashWeb,
                     filename
                 );
@@ -751,8 +751,8 @@ var ContextMenu = function() {
                     "{0}/attach{1}/{2}/{3}?filename={4}",
                     binPath,
                     scriptSuffix,
-                    web,
-                    topic,
+                    encodeURI(web),
+                    encodeURI(topic),
                     filename
                 );
 
@@ -881,8 +881,8 @@ var ContextMenu = function() {
                     "{0}/attach{1}/{2}/{3}?filename={4}",
                     binPath,
                     scriptSuffix,
-                    web,
-                    topic,
+                    encodeURI(web),
+                    encodeURI(topic),
                     filename
                 );
 
@@ -968,8 +968,8 @@ var ContextMenu = function() {
                     "{0}/rest{1}/ModacContextMenuPlugin/isLocked?w={2}&t={3}&a={4}",
                     binPath,
                     scriptSuffix,
-                    web,
-                    topic,
+                    encodeURI(web),
+                    encodeURI(topic),
                     filename
                 );
 
