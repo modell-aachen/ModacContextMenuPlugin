@@ -399,6 +399,7 @@ var ContextMenu = function() {
 
                     var newTopic = topic + '_files'; // hard corded in FilesysVirtual
                     var davHref = href.replace(topic, newTopic).replace(pubPath, davUrl + '/' + token);
+                    davHref = decodeURI( davHref );
 
                     if (isIE) {
                         return webdavInvokeIE(component, davHref, false);
