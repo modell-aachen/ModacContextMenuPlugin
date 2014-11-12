@@ -51,14 +51,14 @@ sub initPlugin {
   $langCode = 'en' unless $langCode =~ /en|de/i;
 
   my $script = <<"SCRIPT";
-<script type="text/javascript" src="$pluginUrl/jquery.contextMenu.js"></script>
-<script type="text/javascript" src="$pluginUrl/jquery.ui.position.js"></script>
-<script type="text/javascript" src="$pluginUrl/lang/$langCode.js"></script>
-<script type="text/javascript" src="$pluginUrl/modac.contextMenu.js"></script>
+<script type="text/javascript" src="$pluginUrl/jquery.contextMenu.js?version=$RELEASE"></script>
+<script type="text/javascript" src="$pluginUrl/jquery.ui.position.js?version=$RELEASE"></script>
+<script type="text/javascript" src="$pluginUrl/lang/$langCode.js?version=$RELEASE"></script>
+<script type="text/javascript" src="$pluginUrl/modac.contextMenu.js?version=$RELEASE"></script>
 SCRIPT
 
   my $meta = <<"META";
-<link rel='stylesheet' type='text/css' media='all' href='$pluginUrl/jquery.contextMenu.css' />
+<link rel="stylesheet" type="text/css" media="all" href="$pluginUrl/jquery.contextMenu.css?version=$RELEASE" />
 META
 
   Foswiki::Func::addToZone( 'head', 'MODACCONTEXTMENUPLUGIN:STYLES', $meta );
