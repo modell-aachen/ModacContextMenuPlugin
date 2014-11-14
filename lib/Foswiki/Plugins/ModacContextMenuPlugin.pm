@@ -99,7 +99,7 @@ sub _restTokenizer {
     my $fs = Filesys::Virtual::Foswiki->new(\%opts);
     my $db = $fs->_locks();
     my %data = (user => $wikiName, path => $path, file => $attachment);
-    my $token = Digest::SHA::sha1_hex( \%data . rand(1000) );
+    my $token = Digest::SHA::sha1_hex( encode_json( \%data ) . rand(1_000_000) );
     if ( $db->setAuthToken( $token, \%data ) )
     {
       $response->pushHeader( 'X-MA-TOKEN', $token );

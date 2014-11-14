@@ -388,7 +388,7 @@ var ContextMenu = function() {
                     filename
                 );
 
-                $.ajax({url: restUrl}).done(function(data, status, xhr) {
+                $.ajax({url: restUrl, cache: false}).done(function(data, status, xhr) {
                     var token = xhr.getResponseHeader('X-MA-TOKEN');
                     if (!token) {
                         if (window.console && window.console.error) {
