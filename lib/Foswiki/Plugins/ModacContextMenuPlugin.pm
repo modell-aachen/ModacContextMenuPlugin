@@ -6,9 +6,7 @@ use warnings;
 use Foswiki::Func    ();
 use Foswiki::Plugins ();
 
-use Filesys::Virtual::Foswiki;
 use Digest::SHA;
-
 use JSON;
 
 use version;
@@ -96,6 +94,8 @@ sub _restTokenizer {
     my ($w, $t) = Foswiki::Func::normalizeWebTopicName( $web, $topic );
     my $path = "$w/$t";
     my %opts = (validateLogin => 0);
+
+    require Filesys::Virtual::Foswiki;
     my $fs = Filesys::Virtual::Foswiki->new(\%opts);
     my $db = $fs->_locks();
     my %data = (user => $wikiName, path => $path, file => $attachment);
