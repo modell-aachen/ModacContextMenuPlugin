@@ -58,7 +58,7 @@ var ContextMenu = function() {
     var isIE = /MSIE|Trident/.test(navigator.userAgent);
 
     var isSupportedBrowser = function() {
-        var isSupported = isFirefox || isIE;
+        var isSupported = isFirefox || isIE || isChrome;
         return isSupported;
     };
 
@@ -367,14 +367,7 @@ var ContextMenu = function() {
             isTemplate = templates.test(extension);
         }
 
-        var isEditEnabled = davEnabledBrowser && hasDavUrl && hasApps && hasHandler && kvpCanEdit;
-
-        var davHref = href;
-        if (hasDavUrl && hasHandler) {
-            var newTopic = topic + '_files'; // hard corded in FilesysVirtual
-            davHref = davHref.replace(topic, newTopic);
-            davHref = davHref.replace(pubPath, davUrl);
-        }
+        var isEditEnabled = davEnabledBrowser && hasApps && kvpCanEdit && hasDavUrl && hasHandler;
 
         /*
          * regular menu
@@ -385,27 +378,57 @@ var ContextMenu = function() {
             disabled: !isEditEnabled,
             callback: function(key, opts) {
                 if (window.kvpDiscussionConfirmation && !window.kvpDiscussionConfirmation()) return false;
-                if (isIE) {
-                    return webdavInvokeIE(component, davHref, false);
-                }
 
-                if (isFirefox || isChrome) {
-                    if (isFirefox && !foswiki.hasFFAddon) {
-                        createFirefoxAddonDialog();
+                var restUrl = formatString(
+                    "{0}/rest{1}/ModacContextMenuPlugin/tokenizer?w={2}&t={3}&a={4}",
+                    binPath,
+                    scriptSuffix,
+                    web,
+                    topic,
+                    filename
+                );
+
+                $.ajax({url: restUrl, cache: false}).done(function(data, status, xhr) {
+                    var token = xhr.getResponseHeader('X-MA-TOKEN');
+                    if (!token) {
+                        if (window.console && window.console.error) {
+                            console.error('Missing token!');
+                        }
                         return;
                     }
 
-                    var div = document.getElementById('hiddenContainer');
-                    var a = document.createElement('a');
-                    a.setAttribute('href', davHref);
-                    div.appendChild(a);
+                    var newTopic = topic + '_files'; // hard corded in FilesysVirtual
+                    var davHref = href.replace(topic, newTopic).replace(pubPath, davUrl + '/' + token);
+                    davHref = decodeURI( davHref );
 
-                    a.onclick = function(e) {
-                        return webdavInvoke(e);
-                    };
+                    if (isIE) {
+                        return webdavInvokeIE(component, davHref, false);
+                    }
 
-                    a.click();
-                }
+                    if (isFirefox || isChrome) {
+                        if (isFirefox && !foswiki.hasFFAddon) {
+                            createFirefoxAddonDialog();
+                            return;
+                        }
+
+                        var div = document.getElementById('hiddenContainer');
+                        var a = document.createElement('a');
+
+                        a.setAttribute('href', davHref);
+                        div.appendChild(a);
+
+                        a.onclick = function(e) {
+                            return webdavInvoke(e);
+                        };
+
+                        a.click();
+                    }
+                }).fail(function(xhr, status, err) {
+                    if (window.console && window.console.error) {
+                        console.error('Acquiring token failed!');
+                        console.error(err);
+                    }
+                });
             }
         };
 

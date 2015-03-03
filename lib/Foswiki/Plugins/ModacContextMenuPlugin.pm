@@ -6,6 +6,7 @@ use warnings;
 use Foswiki::Func    ();
 use Foswiki::Plugins ();
 
+use Digest::SHA;
 use JSON;
 
 use version;
@@ -32,6 +33,7 @@ sub initPlugin {
 
   # rest handler to interact with FilesysVirtualPlugin
   Foswiki::Func::registerRESTHandler( 'isLocked', \&_restIsLocked );
+  Foswiki::Func::registerRESTHandler( 'tokenizer', \&_restTokenizer );
 
   my $jqAvailable = $Foswiki::cfg{Plugins}{JQueryPlugin}{Enabled};
   unless ( $jqAvailable ) {
@@ -47,14 +49,14 @@ sub initPlugin {
   $langCode = 'en' unless $langCode =~ /en|de/i;
 
   my $script = <<"SCRIPT";
-<script type="text/javascript" src="$pluginUrl/jquery.contextMenu.js"></script>
-<script type="text/javascript" src="$pluginUrl/jquery.ui.position.js"></script>
-<script type="text/javascript" src="$pluginUrl/lang/$langCode.js"></script>
-<script type="text/javascript" src="$pluginUrl/modac.contextMenu.js"></script>
+<script type="text/javascript" src="$pluginUrl/jquery.contextMenu.js?version=$RELEASE"></script>
+<script type="text/javascript" src="$pluginUrl/jquery.ui.position.js?version=$RELEASE"></script>
+<script type="text/javascript" src="$pluginUrl/lang/$langCode.js?version=$RELEASE"></script>
+<script type="text/javascript" src="$pluginUrl/modac.contextMenu.js?version=$RELEASE"></script>
 SCRIPT
 
   my $meta = <<"META";
-<link rel='stylesheet' type='text/css' media='all' href='$pluginUrl/jquery.contextMenu.css' />
+<link rel="stylesheet" type="text/css" media="all" href="$pluginUrl/jquery.contextMenu.css?version=$RELEASE" />
 META
 
   Foswiki::Func::addToZone( 'head', 'MODACCONTEXTMENUPLUGIN:STYLES', $meta );
@@ -76,6 +78,36 @@ sub _handlePrettyUserTag {
   # ToDo: WikiWord -> Wiki Word
 
   return $wikiWord;
+}
+
+sub _restTokenizer {
+  my ( $session, $subject, $verb, $response ) = @_;
+  my $query = $session->{request};
+
+  my $web = $query->{param}->{w}[0];
+  my $topic = $query->{param}->{t}[0];
+  my $attachment = $query->{param}->{a}[0];
+
+  my $wikiName = Foswiki::Func::getWikiName( $session->{user} );
+  my $guest = $Foswiki::cfg{DefaultUserWikiName} || 'WikiGuest';
+  if ( $wikiName ne $guest ) {
+    my ($w, $t) = Foswiki::Func::normalizeWebTopicName( $web, $topic );
+    my $path = "$w/$t";
+    my %opts = (validateLogin => 0);
+
+    require Filesys::Virtual::Foswiki;
+    my $fs = Filesys::Virtual::Foswiki->new(\%opts);
+    my $db = $fs->_locks();
+    my %data = (user => $wikiName, path => $path, file => $attachment);
+    my $token = Digest::SHA::sha1_hex( encode_json( \%data ) . rand(1_000_000) );
+    if ( $db->setAuthToken( $token, \%data ) )
+    {
+      $response->pushHeader( 'X-MA-TOKEN', $token );
+    }
+  }
+
+  $response->status(200);
+  return '';
 }
 
 sub _restIsLocked {
