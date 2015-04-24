@@ -445,7 +445,12 @@ var ContextMenu = function() {
             name: lang.downloadAttachment,
             icon: 'download',
             callback: function(key, opts) {
-                window.location.href = href;
+                var cm = foswiki.getPreference('contextMenu');
+                if ( cm.newWindow ) {
+                    window.open(href);
+                } else {
+                    window.location.href = href;
+                }
             }
         };
 
@@ -861,7 +866,12 @@ var ContextMenu = function() {
             name: lang.downloadAttachment,
             icon: 'download',
             callback: function(key, opts) {
-                window.location.href = href;
+                var cm = foswiki.getPreference('contextMenu');
+                if ( cm.newWindow ) {
+                    window.open(href);
+                } else {
+                    window.location.href = href;
+                }
             }
         };
 
@@ -1053,8 +1063,12 @@ var ContextMenu = function() {
 (function($) {
     $(document).ready(function() {
         window.foswiki.ModacContextMenuPlugin = new ContextMenu();
+        var cm = foswiki.getPreference('contextMenu');
+        if ( !cm.useContextMenu ) {
+            return;
+        }
 
-        var ti = foswiki.getPreference('contextMenu').topicInteraction;
+        var ti = cm.topicInteraction;
 
         if (!ti) {
             var table = $('div.foswikiAttachments').find('table');
