@@ -18,6 +18,15 @@ In addition you may enable an _enhanced_ AttachTableSkin.
 * Set SKIN = contextmenu,...
 </verbatim>
 
+
+---++ Configuration
+ModacContextMenuPlugin looks for a preference key called MODAC_CONTEXT_BLANK.
+If this key is set to one of *1, true or enable*, attachments will be opened in a new tab/window.
+
+<verbatim>
+   * Set MODAC_CONTEXT_BLANK = 1
+</verbatim>
+
 ---++ Info
 
 |  Author(s): | Sven Meyer |
