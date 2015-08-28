@@ -60,7 +60,7 @@ SCRIPT
 META
 
   Foswiki::Func::addToZone( 'head', 'MODACCONTEXTMENUPLUGIN:STYLES', $meta );
-  Foswiki::Func::addToZone( 'script', 'MODACCONTEXTMENUPLUGIN:SCRIPTS', $script, 'JQUERYPLUGIN::FOSWIKI::PREFERENCES' );
+  Foswiki::Func::addToZone( 'script', 'MODACCONTEXTMENUPLUGIN:SCRIPTS', $script, 'MODACCONTEXTMENUPLUGIN:PREFS' );
   Foswiki::Plugins::JQueryPlugin::createPlugin( 'blockui' );
   Foswiki::Plugins::JQueryPlugin::createPlugin( 'livequery' );
 
