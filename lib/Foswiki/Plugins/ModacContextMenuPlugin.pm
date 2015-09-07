@@ -142,6 +142,11 @@ sub _restIsLocked {
         $owner = $1;
       }
 
+      my $timeout = $lock->{timeout} || $Foswiki::cfg{LeaseLength} || 3600;
+      my $now = time;
+      my $taken = $lock->{taken} || $now;
+      next unless ($taken + $timeout gt $now);
+
       my $wikiName = Foswiki::Func::userToWikiName( $owner, 1 );
       return "{ \"isLocked\": 1, \"owner\": \"$wikiName\" }"
     }
