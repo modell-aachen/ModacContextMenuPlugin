@@ -32,8 +32,8 @@ sub initPlugin {
   Foswiki::Func::registerTagHandler( 'PRETTYUSER', \&_handlePrettyUserTag );
 
   # rest handler to interact with FilesysVirtualPlugin
-  Foswiki::Func::registerRESTHandler( 'isLocked', \&_restIsLocked, {http_allow => 'GET', validate => 0, authenticate => 0} );
-  Foswiki::Func::registerRESTHandler( 'tokenizer', \&_restTokenizer, {http_allow => 'GET', validate => 0, authenticate => 1} );
+  Foswiki::Func::registerRESTHandler( 'isLocked', \&_restIsLocked, http_allow => 'GET', validate => 0, authenticate => 0 );
+  Foswiki::Func::registerRESTHandler( 'tokenizer', \&_restTokenizer, http_allow => 'GET', validate => 0, authenticate => 1 );
 
   my $jqAvailable = $Foswiki::cfg{Plugins}{JQueryPlugin}{Enabled};
   unless ( $jqAvailable ) {
