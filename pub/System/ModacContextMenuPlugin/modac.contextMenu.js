@@ -330,7 +330,9 @@ var ContextMenu = function() {
         var $this = $(td);
 
         // attach to second column of attachments table.
-        var href = $this.find('a').attr('href');
+        var $a = $this.find('a');
+        var href = $a.attr('href');
+        var deleteUrl = $a.data('delete-url') || $a.attr('data-delete-url') || '';
         var pattern = /.*\/(.+)$/;
         var filename;
         var match = pattern.exec(href);
@@ -711,15 +713,17 @@ var ContextMenu = function() {
             disabled: !kvpCanEdit,
             callback: function(key, opts) {
                 var trashWeb = foswiki.getPreference('contextMenu').trashWeb;
-                var deleteUrl = formatString(
-                    "{0}/rename{1}/{2}/{3}?newweb={4};newtopic=TrashAttachment;template=renameattachmentdelete;attachment={5}",
-                    binPath,
-                    scriptSuffix,
-                    encodeURI(web),
-                    encodeURI(topic),
-                    trashWeb,
-                    filename
-                );
+                if ( !deleteUrl || /^[\s\r\n]*$/.test(deleteUrl) ) {
+                    deleteUrl = formatString(
+                        "{0}/rename{1}/{2}/{3}?newweb={4};newtopic=TrashAttachment;template=renameattachmentdelete;attachment={5}",
+                        binPath,
+                        scriptSuffix,
+                        encodeURI(web),
+                        encodeURI(topic),
+                        trashWeb,
+                        filename
+                    );
+                }
 
                 blockUI();
                 $.ajax({
