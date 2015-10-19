@@ -553,7 +553,7 @@ var ContextMenu = function() {
                         $(d).html(form);
 
                         $(d).dialog({
-                            title: formatString(lang.manageVersionsDialogTitle, filename),
+                            title: formatString(lang.manageVersionsDialogTitle, decodeURIComponent(filename)),
                             closeOnEscape: true,
                             modal: true,
                             minWidth: 700,
@@ -611,7 +611,7 @@ var ContextMenu = function() {
                         $(form).appendTo(d);
 
                         $(d).dialog({
-                            title: formatString(lang.moveAttachmentDialogTitle, filename),
+                            title: formatString(lang.moveAttachmentDialogTitle, decodeURIComponent(filename)),
                             closeOnEscape: true,
                             modal: true,
                             minWidth: 700,
@@ -676,7 +676,7 @@ var ContextMenu = function() {
                         $(form).appendTo(d);
 
                         $(d).dialog({
-                            title: formatString(lang.renameAttachmentDialogTitle, filename),
+                            title: formatString(lang.renameAttachmentDialogTitle, decodeURIComponent(filename)),
                             closeOnEscape: true,
                             modal: true,
                             minWidth: 700,
@@ -743,7 +743,7 @@ var ContextMenu = function() {
                         $(form).appendTo(d);
 
                         $(d).dialog({
-                            title: formatString(lang.deleteAttachmentDialogTitle, filename),
+                            title: formatString(lang.deleteAttachmentDialogTitle, decodeURIComponent(filename)),
                             closeOnEscape: true,
                             modal: true,
                             width: 450,
