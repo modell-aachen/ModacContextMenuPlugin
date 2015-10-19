@@ -403,10 +403,10 @@ var ContextMenu = function() {
                     }
 
                     if (isFirefox || isChrome) {
-                        //if (isFirefox && !foswiki.hasFFAddon) {
-                        //    createFirefoxAddonDialog();
-                        //    return;
-                        //}
+                        if (isFirefox && !foswiki.hasFFAddon) {
+                           createFirefoxAddonDialog();
+                           return;
+                        }
 
                         var div = document.getElementById('hiddenContainer');
                         var a = document.createElement('a');
