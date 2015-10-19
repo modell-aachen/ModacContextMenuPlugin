@@ -122,7 +122,7 @@ var ContextMenu = function() {
     // tries to access a public resource of FF's qwiki-webdav addon.
     // will fail when not available (not installed, not FF at all)
     var checkFirefoxAddOn = function() {
-        document.body.addEventListener('qwiki.webdav.hasmozaddon', function(evt) {
+        document.body.addEventListener('qwiki.webdav.mozaddon', function(evt) {
             foswiki.hasFFAddon = true;
         });
 
