@@ -130,6 +130,16 @@ var ContextMenu = function() {
         document.body.dispatchEvent(ev);
     };
 
+    // see above
+    var checkChromeAddOn = function() {
+        document.body.addEventListener('qwiki.webdav.chromeaddon', function(evt) {
+            foswiki.hasChromeAddon = true;
+        });
+
+        var ev = new CustomEvent('qwiki.webdav.haschromeaddon');
+        document.body.dispatchEvent(ev);
+    };
+
     var createErrorDialog = function() {
         var d = $('<div></div>');
         $(d).text(lang.oopsText);
@@ -159,12 +169,43 @@ var ContextMenu = function() {
     var createFirefoxAddonDialog = function() {
         var d = $('<div></div>');
         var a = '<a href="https://addons.mozilla.org/de/firefox/addon/qwiki-webdav/" title="Firefox Extension" target="_blank"></a>';
-        var text = formatString(lang.webdavHintText, a);
+        var text = formatString(lang.webdavFFHintText, a);
         $(d).html(text);
-        $(d).find('a').text(lang.webdavLinkText);
+        $(d).find('a').text(lang.webdavFFLinkText);
 
         $(d).dialog({
-            title: lang.webdavHintTitle,
+            title: lang.webdavFFHintTitle,
+            width: 550,
+            height: 150,
+            resizable: false,
+            modal: true,
+            show: {
+                effect: 'fade',
+                duration: 500
+            },
+            hide: {
+                effect: 'fade',
+                duration: 300
+            },
+            buttons: [{
+                text: lang.btnCloseText,
+                click: function() {
+                    $(this).dialog('close');
+                }
+            }]
+        });
+    };
+
+    // same as above but for Google's Chrome
+    var createChromeAddonDialog = function() {
+        var d = $('<div></div>');
+        var a = '<a href="#todo" title="Google Chrome Extension" target="_blank"></a>';
+        var text = formatString(lang.webdavChromeHintText, a);
+        $(d).html(text);
+        $(d).find('a').text(lang.webdavChromeLinkText);
+
+        $(d).dialog({
+            title: lang.webdavChromeHintTitle,
             width: 550,
             height: 150,
             resizable: false,
@@ -405,6 +446,11 @@ var ContextMenu = function() {
                     if (isFirefox || isChrome) {
                         if (isFirefox && !foswiki.hasFFAddon) {
                            createFirefoxAddonDialog();
+                           return;
+                        }
+
+                        if (isChrome && !foswiki.hasChromeAddon) {
+                           createChromeAddonDialog();
                            return;
                         }
 
@@ -1050,8 +1096,9 @@ var ContextMenu = function() {
 
     if (isChrome || isFirefox) {
         // Attach an invisible container.
-        // Used to notify the FF addon (you cannot fire an event for a virtual element)
         if (isFirefox)
+            checkFirefoxAddOn();
+        if (isChrome)
             checkFirefoxAddOn();
 
         var hidden = '<div id="hiddenContainer" style="display:none;"></div>';
