@@ -199,7 +199,7 @@ var ContextMenu = function() {
     // same as above but for Google's Chrome
     var createChromeAddonDialog = function() {
         var d = $('<div></div>');
-        var a = '<a href="#todo" title="Google Chrome Extension" target="_blank"></a>';
+        var a = '<a href="https://chrome.google.com/webstore/detail/qwiki-office-connector/khjnieflpflngolekdehbnglfbfmfeoa?authuser=1" title="Google Chrome Extension" target="_blank"></a>';
         var text = formatString(lang.webdavChromeHintText, a);
         $(d).html(text);
         $(d).find('a').text(lang.webdavChromeLinkText);
