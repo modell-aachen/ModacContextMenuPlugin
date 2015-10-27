@@ -119,27 +119,6 @@ var ContextMenu = function() {
         return lockedMenu;
     };
 
-    // tries to access a public resource of FF's qwiki-webdav addon.
-    // will fail when not available (not installed, not FF at all)
-    var checkFirefoxAddOn = function() {
-        document.body.addEventListener('qwiki.webdav.mozaddon', function(evt) {
-            foswiki.hasFFAddon = true;
-        });
-
-        var ev = new CustomEvent('qwiki.webdav.hasmozaddon');
-        document.body.dispatchEvent(ev);
-    };
-
-    // see above
-    var checkChromeAddOn = function() {
-        document.body.addEventListener('qwiki.webdav.chromeaddon', function(evt) {
-            foswiki.hasChromeAddon = true;
-        });
-
-        var ev = new CustomEvent('qwiki.webdav.haschromeaddon');
-        document.body.dispatchEvent(ev);
-    };
-
     var createErrorDialog = function() {
         var d = $('<div></div>');
         $(d).text(lang.oopsText);
@@ -1078,6 +1057,26 @@ var ContextMenu = function() {
         });
     };
 
+    // pings the according addon.
+    ContextMenu.prototype.checkFirefoxAddOn = function() {
+        document.body.addEventListener('qwiki.webdav.mozaddon', function(evt) {
+            foswiki.hasFFAddon = true;
+        });
+
+        var ev = new CustomEvent('qwiki.webdav.hasmozaddon');
+        document.body.dispatchEvent(ev);
+    };
+
+    // see above
+    ContextMenu.prototype.checkChromeAddOn = function() {
+        document.body.addEventListener('qwiki.webdav.chromeaddon', function(evt) {
+            foswiki.hasChromeAddon = true;
+        });
+
+        var ev = new CustomEvent('qwiki.webdav.haschromeaddon');
+        document.body.dispatchEvent(ev);
+    };
+
     ContextMenu.prototype.addSeparator = function(position) {
         if (!position) position = entries.length + 11;
 
@@ -1096,11 +1095,6 @@ var ContextMenu = function() {
 
     if (isChrome || isFirefox) {
         // Attach an invisible container.
-        if (isFirefox)
-            checkFirefoxAddOn();
-        if (isChrome)
-            checkFirefoxAddOn();
-
         var hidden = '<div id="hiddenContainer" style="display:none;"></div>';
         $(hidden).appendTo('body');
     }
@@ -1114,9 +1108,14 @@ var ContextMenu = function() {
             return;
         }
 
-        var ti = cm.topicInteraction;
+        // Deferre checks. At least Chrome needs some time to get it's
+        // content scripts running...
+        setTimeout(function() {
+            foswiki.ModacContextMenuPlugin.checkChromeAddOn();
+            foswiki.ModacContextMenuPlugin.checkFirefoxAddOn();
+        }, 500);
 
-        if (!ti) {
+        if (!cm.topicInteraction) {
             var table = $('div.foswikiAttachments').find('table');
             var tds = $(table).find('td.foswikiTableCol1');
             $.each(tds, function(i, e) {
