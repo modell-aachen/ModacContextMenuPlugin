@@ -119,21 +119,6 @@ var ContextMenu = function() {
         return lockedMenu;
     };
 
-    // tries to access a public resource of FF's qwiki-webdav addon.
-    // will fail when not available (not installed, not FF at all)
-    var checkFirefoxAddOn = function() {
-        var img = document.createElement('img');
-        img.addEventListener('load', function(e) {
-            foswiki.hasFFAddon = true;
-        }, false);
-
-        img.addEventListener('error', function(e) {
-            foswiki.hasFFAddon = false;
-        }, false);
-
-        img.setAttribute('src', 'chrome://msolink/skin/icon.png');
-    };
-
     var createErrorDialog = function() {
         var d = $('<div></div>');
         $(d).text(lang.oopsText);
@@ -163,12 +148,43 @@ var ContextMenu = function() {
     var createFirefoxAddonDialog = function() {
         var d = $('<div></div>');
         var a = '<a href="https://addons.mozilla.org/de/firefox/addon/qwiki-webdav/" title="Firefox Extension" target="_blank"></a>';
-        var text = formatString(lang.webdavHintText, a);
+        var text = formatString(lang.webdavFFHintText, a);
         $(d).html(text);
-        $(d).find('a').text(lang.webdavLinkText);
+        $(d).find('a').text(lang.webdavFFLinkText);
 
         $(d).dialog({
-            title: lang.webdavHintTitle,
+            title: lang.webdavFFHintTitle,
+            width: 550,
+            height: 150,
+            resizable: false,
+            modal: true,
+            show: {
+                effect: 'fade',
+                duration: 500
+            },
+            hide: {
+                effect: 'fade',
+                duration: 300
+            },
+            buttons: [{
+                text: lang.btnCloseText,
+                click: function() {
+                    $(this).dialog('close');
+                }
+            }]
+        });
+    };
+
+    // same as above but for Google's Chrome
+    var createChromeAddonDialog = function() {
+        var d = $('<div></div>');
+        var a = '<a href="https://chrome.google.com/webstore/detail/qwiki-office-connector/khjnieflpflngolekdehbnglfbfmfeoa?authuser=1" title="Google Chrome Extension" target="_blank"></a>';
+        var text = formatString(lang.webdavChromeHintText, a);
+        $(d).html(text);
+        $(d).find('a').text(lang.webdavChromeLinkText);
+
+        $(d).dialog({
+            title: lang.webdavChromeHintTitle,
             width: 550,
             height: 150,
             resizable: false,
@@ -256,9 +272,8 @@ var ContextMenu = function() {
     // in order to launch Office
     // Mozilla only
     var webdavInvoke = function(e) {
-        var ev = document.createEvent('Events');
-        ev.initEvent('webdav_open', true, true);
-        e.currentTarget.dispatchEvent(ev);
+        var ev = new CustomEvent('qwiki.webdav.open', {'detail': e.currentTarget.href});
+        document.body.dispatchEvent(ev);
         return false;
     };
 
@@ -409,8 +424,13 @@ var ContextMenu = function() {
 
                     if (isFirefox || isChrome) {
                         if (isFirefox && !foswiki.hasFFAddon) {
-                            createFirefoxAddonDialog();
-                            return;
+                           createFirefoxAddonDialog();
+                           return;
+                        }
+
+                        if (isChrome && !foswiki.hasChromeAddon) {
+                           createChromeAddonDialog();
+                           return;
                         }
 
                         var div = document.getElementById('hiddenContainer');
@@ -1037,6 +1057,26 @@ var ContextMenu = function() {
         });
     };
 
+    // pings the according addon.
+    ContextMenu.prototype.checkFirefoxAddOn = function() {
+        document.body.addEventListener('qwiki.webdav.mozaddon', function(evt) {
+            foswiki.hasFFAddon = true;
+        });
+
+        var ev = new CustomEvent('qwiki.webdav.hasmozaddon');
+        document.body.dispatchEvent(ev);
+    };
+
+    // see above
+    ContextMenu.prototype.checkChromeAddOn = function() {
+        document.body.addEventListener('qwiki.webdav.chromeaddon', function(evt) {
+            foswiki.hasChromeAddon = true;
+        });
+
+        var ev = new CustomEvent('qwiki.webdav.haschromeaddon');
+        document.body.dispatchEvent(ev);
+    };
+
     ContextMenu.prototype.addSeparator = function(position) {
         if (!position) position = entries.length + 11;
 
@@ -1055,10 +1095,6 @@ var ContextMenu = function() {
 
     if (isChrome || isFirefox) {
         // Attach an invisible container.
-        // Used to notify the FF addon (you cannot fire an event for a virtual element)
-        if (isFirefox)
-            checkFirefoxAddOn();
-
         var hidden = '<div id="hiddenContainer" style="display:none;"></div>';
         $(hidden).appendTo('body');
     }
@@ -1072,9 +1108,14 @@ var ContextMenu = function() {
             return;
         }
 
-        var ti = cm.topicInteraction;
+        // Deferre checks. At least Chrome needs some time to get it's
+        // content scripts running...
+        setTimeout(function() {
+            foswiki.ModacContextMenuPlugin.checkChromeAddOn();
+            foswiki.ModacContextMenuPlugin.checkFirefoxAddOn();
+        }, 500);
 
-        if (!ti) {
+        if (!cm.topicInteraction) {
             var table = $('div.foswikiAttachments').find('table');
             var tds = $(table).find('td.foswikiTableCol1');
             $.each(tds, function(i, e) {
