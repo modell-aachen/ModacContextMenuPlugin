@@ -43,6 +43,9 @@ sub initPlugin {
     return 0;
   }
 
+  my $context = Foswiki::Func::getContext();
+  return 1 unless $context->{view} || $context->{edit};
+
   my $pluginUrl = '%PUBURLPATH%/%SYSTEMWEB%/ModacContextMenuPlugin';
 
   my $langCode = $Foswiki::Plugins::SESSION->i18n->language;
