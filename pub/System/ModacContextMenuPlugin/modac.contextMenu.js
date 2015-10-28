@@ -1103,6 +1103,7 @@ var ContextMenu = function() {
 (function($) {
     $(document).ready(function() {
         window.foswiki.ModacContextMenuPlugin = new ContextMenu();
+        var menu = foswiki.ModacContextMenuPlugin;
         var cm = foswiki.getPreference('contextMenu');
         if ( !cm.useContextMenu ) {
             return;
@@ -1111,20 +1112,25 @@ var ContextMenu = function() {
         // Deferre checks. At least Chrome needs some time to get it's
         // content scripts running...
         setTimeout(function() {
-            foswiki.ModacContextMenuPlugin.checkChromeAddOn();
-            foswiki.ModacContextMenuPlugin.checkFirefoxAddOn();
+            if (menu && typeof menu.checkChromeAddOn === 'function') {
+                menu.checkChromeAddOn();
+            }
+
+            if (menu && typeof menu.checkFirefoxAddOn === 'function') {
+                menu.checkFirefoxAddOn();
+            }
         }, 500);
 
         if (!cm.topicInteraction) {
             var table = $('div.foswikiAttachments').find('table');
             var tds = $(table).find('td.foswikiTableCol1');
             $.each(tds, function(i, e) {
-                foswiki.ModacContextMenuPlugin.attachContextMenu(e);
+                menu.attachContextMenu(e);
             });
         } else {
             var container = $('div.foswikiAttachmentName');
             container.each(function(i, e) {
-                foswiki.ModacContextMenuPlugin.attachContextMenu(e);
+                menu.attachContextMenu(e);
             });
         }
     });
