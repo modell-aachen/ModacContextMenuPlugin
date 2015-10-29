@@ -1019,7 +1019,15 @@ var ContextMenu = function() {
             build: function(trigger, e) {
                 var icon = $(td).find('img');
                 var origSrc = $(icon).attr('src');
-                $(icon).attr('src', '/pub/System/ModacContextMenuPlugin/images/ajax-loader.gif');
+                var p = foswiki.preferences;
+                var src = [
+                    p.PUBURLPATH,
+                    '/',
+                    p.SYSTEMWEB,
+                    '/ModacContextMenuPlugin/images/ajax-loader.gif'
+                ].join('');
+
+                $(icon).attr('src', src);
 
                 var restUrl = formatString(
                     "{0}/rest{1}/ModacContextMenuPlugin/isLocked?w={2}&t={3}&a={4}",
