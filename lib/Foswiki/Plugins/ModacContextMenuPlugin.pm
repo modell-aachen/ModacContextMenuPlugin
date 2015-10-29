@@ -44,7 +44,7 @@ sub initPlugin {
   }
 
   my $context = Foswiki::Func::getContext();
-  return 1 unless $context->{view} || $context->{edit};
+  return 1 unless $context->{view} || $context->{edit} || $context->{comparing} || $context->{oops} || $context->{manage};
 
   my $pluginUrl = '%PUBURLPATH%/%SYSTEMWEB%/ModacContextMenuPlugin';
 
