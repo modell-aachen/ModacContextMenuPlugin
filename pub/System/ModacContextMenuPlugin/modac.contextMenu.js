@@ -6,6 +6,7 @@ var ContextMenu = function() {
 
     var entries = [];
     var lang = window.foswiki.ModacContextMenuPluginLang;
+    var self = this;
 
     /**
      * Foswiki preferences
@@ -119,21 +120,6 @@ var ContextMenu = function() {
         return lockedMenu;
     };
 
-    // tries to access a public resource of FF's qwiki-webdav addon.
-    // will fail when not available (not installed, not FF at all)
-    var checkFirefoxAddOn = function() {
-        var img = document.createElement('img');
-        img.addEventListener('load', function(e) {
-            foswiki.hasFFAddon = true;
-        }, false);
-
-        img.addEventListener('error', function(e) {
-            foswiki.hasFFAddon = false;
-        }, false);
-
-        img.setAttribute('src', 'chrome://msolink/skin/icon.png');
-    };
-
     var createErrorDialog = function() {
         var d = $('<div></div>');
         $(d).text(lang.oopsText);
@@ -163,12 +149,43 @@ var ContextMenu = function() {
     var createFirefoxAddonDialog = function() {
         var d = $('<div></div>');
         var a = '<a href="https://addons.mozilla.org/de/firefox/addon/qwiki-webdav/" title="Firefox Extension" target="_blank"></a>';
-        var text = formatString(lang.webdavHintText, a);
+        var text = formatString(lang.webdavFFHintText, a);
         $(d).html(text);
-        $(d).find('a').text(lang.webdavLinkText);
+        $(d).find('a').text(lang.webdavFFLinkText);
 
         $(d).dialog({
-            title: lang.webdavHintTitle,
+            title: lang.webdavFFHintTitle,
+            width: 550,
+            height: 150,
+            resizable: false,
+            modal: true,
+            show: {
+                effect: 'fade',
+                duration: 500
+            },
+            hide: {
+                effect: 'fade',
+                duration: 300
+            },
+            buttons: [{
+                text: lang.btnCloseText,
+                click: function() {
+                    $(this).dialog('close');
+                }
+            }]
+        });
+    };
+
+    // same as above but for Google's Chrome
+    var createChromeAddonDialog = function() {
+        var d = $('<div></div>');
+        var a = '<a href="https://chrome.google.com/webstore/detail/qwiki-office-connector/khjnieflpflngolekdehbnglfbfmfeoa?authuser=1" title="Google Chrome Extension" target="_blank"></a>';
+        var text = formatString(lang.webdavChromeHintText, a);
+        $(d).html(text);
+        $(d).find('a').text(lang.webdavChromeLinkText);
+
+        $(d).dialog({
+            title: lang.webdavChromeHintTitle,
             width: 550,
             height: 150,
             resizable: false,
@@ -256,9 +273,8 @@ var ContextMenu = function() {
     // in order to launch Office
     // Mozilla only
     var webdavInvoke = function(e) {
-        var ev = document.createEvent('Events');
-        ev.initEvent('webdav_open', true, true);
-        e.currentTarget.dispatchEvent(ev);
+        var ev = new CustomEvent('qwiki.webdav.open', {'detail': e.currentTarget.href});
+        document.body.dispatchEvent(ev);
         return false;
     };
 
@@ -407,12 +423,7 @@ var ContextMenu = function() {
                         return webdavInvokeIE(component, davHref, false);
                     }
 
-                    if (isFirefox || isChrome) {
-                        if (isFirefox && !foswiki.hasFFAddon) {
-                            createFirefoxAddonDialog();
-                            return;
-                        }
-
+                    var dispatch = function() {
                         var div = document.getElementById('hiddenContainer');
                         var a = document.createElement('a');
 
@@ -424,6 +435,20 @@ var ContextMenu = function() {
                         };
 
                         a.click();
+                    };
+
+                    if (isFirefox) {
+                       self.checkFirefoxAddOn()
+                            .done(dispatch)
+                            .fail(createFirefoxAddonDialog);
+                       return;
+                    }
+
+                    if (isChrome) {
+                        self.checkChromeAddOn()
+                            .done(dispatch)
+                            .fail(createChromeAddonDialog);
+                       return;
                     }
                 }).fail(function(xhr, status, err) {
                     if (window.console && window.console.error) {
@@ -553,7 +578,7 @@ var ContextMenu = function() {
                         $(d).html(form);
 
                         $(d).dialog({
-                            title: formatString(lang.manageVersionsDialogTitle, filename),
+                            title: formatString(lang.manageVersionsDialogTitle, decodeURIComponent(filename)),
                             closeOnEscape: true,
                             modal: true,
                             minWidth: 700,
@@ -611,7 +636,7 @@ var ContextMenu = function() {
                         $(form).appendTo(d);
 
                         $(d).dialog({
-                            title: formatString(lang.moveAttachmentDialogTitle, filename),
+                            title: formatString(lang.moveAttachmentDialogTitle, decodeURIComponent(filename)),
                             closeOnEscape: true,
                             modal: true,
                             minWidth: 700,
@@ -676,7 +701,7 @@ var ContextMenu = function() {
                         $(form).appendTo(d);
 
                         $(d).dialog({
-                            title: formatString(lang.renameAttachmentDialogTitle, filename),
+                            title: formatString(lang.renameAttachmentDialogTitle, decodeURIComponent(filename)),
                             closeOnEscape: true,
                             modal: true,
                             minWidth: 700,
@@ -743,7 +768,7 @@ var ContextMenu = function() {
                         $(form).appendTo(d);
 
                         $(d).dialog({
-                            title: formatString(lang.deleteAttachmentDialogTitle, filename),
+                            title: formatString(lang.deleteAttachmentDialogTitle, decodeURIComponent(filename)),
                             closeOnEscape: true,
                             modal: true,
                             width: 450,
@@ -999,7 +1024,15 @@ var ContextMenu = function() {
             build: function(trigger, e) {
                 var icon = $(td).find('img');
                 var origSrc = $(icon).attr('src');
-                $(icon).attr('src', '/pub/System/ModacContextMenuPlugin/images/ajax-loader.gif');
+                var p = foswiki.preferences;
+                var src = [
+                    p.PUBURLPATH,
+                    '/',
+                    p.SYSTEMWEB,
+                    '/ModacContextMenuPlugin/images/ajax-loader.gif'
+                ].join('');
+
+                $(icon).attr('src', src);
 
                 var restUrl = formatString(
                     "{0}/rest{1}/ModacContextMenuPlugin/isLocked?w={2}&t={3}&a={4}",
@@ -1037,6 +1070,60 @@ var ContextMenu = function() {
         });
     };
 
+    // pings the according addon.
+    ContextMenu.prototype.checkFirefoxAddOn = function() {
+        var deferred = $.Deferred();
+
+        var timer = null;
+        var resolve = function() {
+            if (timer) {
+                clearTimeout(timer)
+                timer = null;
+            }
+
+            document.body.removeEventListener('qwiki.webdav.mozaddon', this);
+            deferred.resolve();
+        };
+
+        timer = setTimeout(function() {
+            document.body.removeEventListener('qwiki.webdav.mozaddon', resolve);
+            deferred.reject();
+        }, 300);
+
+        document.body.addEventListener('qwiki.webdav.mozaddon', resolve);
+        var ev = new CustomEvent('qwiki.webdav.hasmozaddon');
+        document.body.dispatchEvent(ev);
+
+        return deferred.promise();
+    };
+
+    // see above
+    ContextMenu.prototype.checkChromeAddOn = function() {
+        var deferred = $.Deferred();
+
+        var timer = null;
+        var resolve = function() {
+            if (timer) {
+                clearTimeout(timer)
+                timer = null;
+            }
+
+            document.body.removeEventListener('qwiki.webdav.chromeaddon', this);
+            deferred.resolve();
+        };
+
+        timer = setTimeout(function() {
+            document.body.removeEventListener('qwiki.webdav.chromeaddon', resolve);
+            deferred.reject();
+        }, 300);
+
+        document.body.addEventListener('qwiki.webdav.chromeaddon', resolve);
+        var ev = new CustomEvent('qwiki.webdav.haschromeaddon');
+        document.body.dispatchEvent(ev);
+
+        return deferred.promise();
+    };
+
     ContextMenu.prototype.addSeparator = function(position) {
         if (!position) position = entries.length + 11;
 
@@ -1055,10 +1142,6 @@ var ContextMenu = function() {
 
     if (isChrome || isFirefox) {
         // Attach an invisible container.
-        // Used to notify the FF addon (you cannot fire an event for a virtual element)
-        if (isFirefox)
-            checkFirefoxAddOn();
-
         var hidden = '<div id="hiddenContainer" style="display:none;"></div>';
         $(hidden).appendTo('body');
     }
@@ -1067,23 +1150,22 @@ var ContextMenu = function() {
 (function($) {
     $(document).ready(function() {
         window.foswiki.ModacContextMenuPlugin = new ContextMenu();
+        var menu = foswiki.ModacContextMenuPlugin;
         var cm = foswiki.getPreference('contextMenu');
         if ( !cm.useContextMenu ) {
             return;
         }
 
-        var ti = cm.topicInteraction;
-
-        if (!ti) {
+        if (!cm.topicInteraction) {
             var table = $('div.foswikiAttachments').find('table');
             var tds = $(table).find('td.foswikiTableCol1');
             $.each(tds, function(i, e) {
-                foswiki.ModacContextMenuPlugin.attachContextMenu(e);
+                menu.attachContextMenu(e);
             });
         } else {
             var container = $('div.foswikiAttachmentName');
             container.each(function(i, e) {
-                foswiki.ModacContextMenuPlugin.attachContextMenu(e);
+                menu.attachContextMenu(e);
             });
         }
     });

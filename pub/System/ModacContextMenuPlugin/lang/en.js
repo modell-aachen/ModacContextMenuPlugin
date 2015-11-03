@@ -43,9 +43,12 @@
       oopsTitle: 'Oops! An error occurred',
       oopsText: 'Please try again.',
       loginRequiredTitle: 'Login required',
-      webdavHintTitle: 'Firefox add-on required',
-      webdavHintText: 'In order to use this functionality an additional add-on is required.<br />This extension is available for download at the official {0}.',
-      webdavLinkText: 'Mozilla Add-on site'
+      webdavFFHintTitle: 'Firefox add-on required',
+      webdavFFHintText: 'In order to use this functionality an additional add-on is required.<br />This extension is available for download at the official {0}.',
+      webdavFFLinkText: 'Mozilla Add-on site',
+      webdavChromeHintTitle: 'Chrome extension required',
+      webdavChromeHintText: 'In order to use this functionality an additional extension is required.<br />This extension is available for download at the official {0}.',
+      webdavChromeLinkText: 'Google web store'
     };
 
     window.foswiki.ModacContextMenuPluginLang = lang;

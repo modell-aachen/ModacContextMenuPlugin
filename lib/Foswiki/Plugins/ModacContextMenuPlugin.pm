@@ -32,8 +32,8 @@ sub initPlugin {
   Foswiki::Func::registerTagHandler( 'PRETTYUSER', \&_handlePrettyUserTag );
 
   # rest handler to interact with FilesysVirtualPlugin
-  Foswiki::Func::registerRESTHandler( 'isLocked', \&_restIsLocked );
-  Foswiki::Func::registerRESTHandler( 'tokenizer', \&_restTokenizer );
+  Foswiki::Func::registerRESTHandler( 'isLocked', \&_restIsLocked, http_allow => 'GET', validate => 0, authenticate => 0 );
+  Foswiki::Func::registerRESTHandler( 'tokenizer', \&_restTokenizer, http_allow => 'GET', validate => 0, authenticate => 1 );
 
   my $jqAvailable = $Foswiki::cfg{Plugins}{JQueryPlugin}{Enabled};
   unless ( $jqAvailable ) {
@@ -42,6 +42,9 @@ sub initPlugin {
       . 'ModacContextMenuPlugin correctly.' );
     return 0;
   }
+
+  my $context = Foswiki::Func::getContext();
+  return 1 unless $context->{view} || $context->{edit} || $context->{comparing} || $context->{oops} || $context->{manage};
 
   my $pluginUrl = '%PUBURLPATH%/%SYSTEMWEB%/ModacContextMenuPlugin';
 
