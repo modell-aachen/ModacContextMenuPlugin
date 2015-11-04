@@ -25,3 +25,9 @@ templates/attachtables.contextmenu.tmpl 0644
 data/System/ModacContextMenuPlugin.txt 0644
 test/unit/ModacContextMenuPlugin/ModacContextMenuPluginSuite.pm 0644
 test/unit/ModacContextMenuPlugin/ModacContextMenuPluginTests.pm 0644
+pub/System/ModacContextMenuPlugin/2015_11_04_11_56_061.png 0644
+pub/System/ModacContextMenuPlugin/2015_11_04_11_56_122.png 0644
+pub/System/ModacContextMenuPlugin/2015_11_04_11_56_193.png 0644
+pub/System/ModacContextMenuPlugin/2015_11_04_11_56_254.png 0644
+pub/System/ModacContextMenuPlugin/2015_11_04_11_56_325.png 0644
+pub/System/ModacContextMenuPlugin/setup.exe 0444

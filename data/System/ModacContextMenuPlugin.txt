@@ -1,46 +1,68 @@
-%META:TOPICINFO{author="BaseUserMapping_333" comment="reprev" date="1376297731" format="1.1" reprev="2" version="2"}%
----+!! !AmpelPlugin
-<!--
-One line description, required for extensions repository catalog.
-BuildContrib will fill in the SHORTDESCRIPTION with the value of
-$SHORTDESCRIPTION from the .pm module, or you can redefine it here if you
-prefer.
+%META:TOPICINFO{author="BaseUserMapping_333" comment="" date="1446640594" format="1.1" reprev="2" version="4"}%
+---+!! !ModacContextMenuPlugin
+
+<!-- One line description, required for extensions repository catalog. BuildContrib will fill in the SHORTDESCRIPTION with the value of $SHORTDESCRIPTION from the .pm module, or you can redefine it here if you prefer.
    * Set SHORTDESCRIPTION = %$SHORTDESCRIPTION%
 -->
+
 %SHORTDESCRIPTION%
 
 %TOC%
 
 ---++ Installation Instructions
-There are no special steps required. Just install and enable ModacContextMenuPlugin - that's it.
-In addition you may enable an _enhanced_ AttachTableSkin.
-<verbatim>
-* Set SKIN = contextmenu,...
-</verbatim>
 
+There are no special steps required. Just install and enable !ModacContextMenuPlugin - that's it.
+In addition you may enable an _enhanced_ [[AttachTableSkin]].
+<verbatim>   * Set SKIN = contextmenu,...</verbatim>
 
 ---++ Configuration
-ModacContextMenuPlugin looks for a preference key called MODAC_CONTEXT_BLANK.
-If this key is set to one of *1, true or enable*, attachments will be opened in a new tab/window.
 
-<verbatim>
-   * Set MODAC_CONTEXT_BLANK = 1
+!ModacContextMenuPlugin looks for a preference key called MODAC_CONTEXT_BLANK.If this key is set to one of *1, true or enable* , attachments will be opened in a new tab/window.
+<verbatim>   * Set MODAC_CONTEXT_BLANK = 1
 </verbatim>
+
+---++ !WebDAV Integration
+---+++ General Configuration
+%TWISTY{showlink="Show step by step guide" hidelink="Hide"}%
+<img height="536" src="%ATTACHURLPATH%/2015_11_04_11_56_061.png" width="407" />
+
+<img height="533" src="%ATTACHURLPATH%/2015_11_04_11_56_122.png" width="505" />
+
+<img height="537" src="%ATTACHURLPATH%/2015_11_04_11_56_193.png" width="506" />
+%ENDTWISTY%
+
+---+++ Internet Explorer
+%TWISTY{showlink="Show step by step guide" hidelink="Hide"}%
+<img height="540" src="%ATTACHURLPATH%/2015_11_04_11_56_254.png" width="406" />
+
+<img height="535" src="%ATTACHURLPATH%/2015_11_04_11_56_325.png" width="420" />
+%ENDTWISTY%
+
+---+++ Mozilla Firefox
+<a href="https://addons.mozilla.org/de/firefox/addon/qwiki-webdav/" target="_blank">Firefox Add-On</a>
+
+---+++ Google Chrome
+<a href="https://chrome.google.com/webstore/detail/qwiki-office-connector/khjnieflpflngolekdehbnglfbfmfeoa" target="_blank">Chrome Extension</a>
+
+<a href="%ATTACHURLPATH%/setup.exe" target="_blank">Native Host Installer</a>
 
 ---++ Info
 
-|  Author(s): | Sven Meyer |
-|  Copyright: | &copy; Modell Aachen GmbH |
+|  Author(s): | Modell Aachen !GmbH |
+|  Copyright: | &copy; Modell Aachen !GmbH |
 |  License: | [[http://www.gnu.org/licenses/gpl.html][GPL (Gnu General Public License)]] |
 |  Release: | %$RELEASE% |
 |  Version: | %$VERSION% |
-|  Change History: | <!-- versions below in reverse order -->&nbsp; |
+|  Change History: | <!-- versions below in reverse order --> |
 |  Dependencies: | %$DEPENDENCIES% |
 |  Home page: | [[http://www.modell-aachen.de][Modell Aachen]] |
 |  Support: | [[http://www.modell-aachen.de][Modell Aachen]] |
 
-
 <!-- Do _not_ attempt to edit this topic; it is auto-generated. -->
 
-%META:FILEATTACHMENT{name="example.png" attachment="example.png" attr="" comment="" date="1312283293" size="12739" user="BaseUserMapping_333" version="1"}%
-%META:FILEATTACHMENT{name="example2.png" attachment="example2.png" attr="" comment="" date="1312283293" size="12618" user="BaseUserMapping_333" version="1"}%
+%META:FILEATTACHMENT{name="2015_11_04_11_56_061.png" attachment="2015_11_04_11_56_061.png" attr="h" comment="" date="1446638166" path="2015_11_04_11_56_061.png" size="32332" user="BaseUserMapping_333" version="1"}%
+%META:FILEATTACHMENT{name="2015_11_04_11_56_122.png" attachment="2015_11_04_11_56_122.png" attr="h" comment="" date="1446638172" path="2015_11_04_11_56_122.png" size="43920" user="BaseUserMapping_333" version="1"}%
+%META:FILEATTACHMENT{name="2015_11_04_11_56_193.png" attachment="2015_11_04_11_56_193.png" attr="h" comment="" date="1446638179" path="2015_11_04_11_56_193.png" size="40333" user="BaseUserMapping_333" version="1"}%
+%META:FILEATTACHMENT{name="2015_11_04_11_56_254.png" attachment="2015_11_04_11_56_254.png" attr="h" comment="" date="1446638185" path="2015_11_04_11_56_254.png" size="32780" user="BaseUserMapping_333" version="1"}%
+%META:FILEATTACHMENT{name="2015_11_04_11_56_325.png" attachment="2015_11_04_11_56_325.png" attr="h" comment="" date="1446638192" path="2015_11_04_11_56_325.png" size="33721" user="BaseUserMapping_333" version="1"}%
+%META:FILEATTACHMENT{name="setup.exe" attachment="setup.exe" attr="h" comment="" date="1446640594" path="setup.exe" size="608679" user="BaseUserMapping_333" version="1"}%
