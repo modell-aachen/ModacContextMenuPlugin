@@ -749,7 +749,7 @@ var ContextMenu = function() {
         var remove = {
             name: lang.deleteAttachment,
             icon: 'delete',
-            disabled: !kvpCanEdit,
+            disabled: !kvpCanMove,
             callback: function(key, opts) {
                 var trashWeb = foswiki.getPreference('contextMenu').trashWeb;
                 if ( !deleteUrl || /^[\s\r\n]*$/.test(deleteUrl) ) {
