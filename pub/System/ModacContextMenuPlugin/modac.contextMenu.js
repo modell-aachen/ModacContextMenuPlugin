@@ -509,6 +509,20 @@ var ContextMenu = function() {
                     success: function(page, status, xhr) {
                         if (isLoginForm(page)) return;
                         var form = $(page).find('form.modacUpload');
+
+                        // only allow files with same file extension
+                        var name = form.find('input[name="filename"]:first').val();
+                        var ext;
+                        if (name !== undefined) ext = /(\.[^.]+)/.exec(name);
+                        if (ext) {
+                            form.find('input[name="filepath"]').each(function() {
+                                var $this = $(this);
+                                var name = $this.val();
+                                if (($this).prop('accept')) return;
+                                $this.attr('accept', ext[1]);
+                            });
+                        }
+
                         var d = $('<div></div>');
                         $(form).appendTo(d);
 
@@ -735,7 +749,7 @@ var ContextMenu = function() {
         var remove = {
             name: lang.deleteAttachment,
             icon: 'delete',
-            disabled: !kvpCanEdit,
+            disabled: !kvpCanMove,
             callback: function(key, opts) {
                 var trashWeb = foswiki.getPreference('contextMenu').trashWeb;
                 if ( !deleteUrl || /^[\s\r\n]*$/.test(deleteUrl) ) {
