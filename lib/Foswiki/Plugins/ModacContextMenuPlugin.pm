@@ -161,55 +161,55 @@ sub _restIsLocked {
 sub _attachPrefs {
   my ( $web, $topic ) = @_;
 
-  my ( $kvpEnabled, $kvpCanEdit, $kvpCanMove ) = ( 0, 0, 0 );
-  if ( $Foswiki::cfg{Plugins}{KVPPlugin}{Enabled} ) {
-    my $talkSuffix = $Foswiki::cfg{Extensions}{KVPPlugin}{suffix} || "TALK";
-    if ( $topic =~ /^(.+)$talkSuffix$/) {
-      $kvpEnabled = 1;
-      $kvpCanEdit = 1;
-      $kvpCanMove = 1;
-    } else {
-      require Foswiki::Plugins::KVPPlugin;
-      my $kvp = Foswiki::Plugins::KVPPlugin::_initTOPIC( $web, $topic );
-      if ( defined $kvp ) {
-        $kvpEnabled = 1;
-        $kvpCanEdit = $kvp->canEdit;
-        $kvpCanMove = $kvp->canMove;
-      }
-    }
-  }
+  my $trash = $Foswiki::cfg{TrashWebName} || 'Trash';
+  my $ctx = Foswiki::Func::getContext();
+  my %prefs = (
+    kvpIsEnabled => Foswiki::isTrue($ctx->{'KVPControlled'}, 0) ? JSON::true : JSON::false,
+    kvpCanEdit => Foswiki::isTrue($ctx->{'KVPEdit'}, 0) ? JSON::true : JSON::false,
+    davIsEnabled => JSON::false,
+    hasLocation => JSON::true,
+    newWindow => JSON::false,
+    trashWeb => $trash,
+    canEdit => JSON::false,
+    canDelete => JSON::false
+  );
 
-  my $davPrefs = "\"davIsEnabled\": 0";
+  my $session = $Foswiki::Plugins::SESSION;
+  my $change = Foswiki::Func::checkAccessPermission('CHANGE', $session->{user}, undef, $topic, $web);
+  $prefs{canEdit} = $change ? JSON::true : JSON::false;
+  $prefs{canDelete} = $prefs{canEdit};
+
   # double checked in order to support virtual hosting.
   if ( $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{WebDAVEnabled} ) {
-    my $hasLocation = 1;
     my $location = $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{WebDAVLocation} || "";
     unless ( $location ) {
       Foswiki::Func::writeWarning( "No WebDAV location specified (in Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{WebDAVLocation})." );
-      $hasLocation = 0;
+      $prefs{hasLocation} = JSON::false;
     }
 
-    my $session = $Foswiki::Plugins::SESSION;
     my $server = $session->{urlHost};
-
     my $davUrl = Foswiki::urlEncode( $server . $location );
     my $cfgApps = $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{WebDAVApps} || '';
     my $officeApps = Foswiki::urlEncode( JSON::to_json( $cfgApps ) );
 
-    $davPrefs = "\"davIsEnabled\": 1, \"davHasUrl\": $hasLocation, \"davUrl\": \"$davUrl\", \"apps\": \"$officeApps\"";
+    $prefs{davIsEnabled} = JSON::true;
+    $prefs{davUrl} = $davUrl;
+    $prefs{apps} = $officeApps;
   }
 
-  my $kvpPrefs = "\"kvpIsEnabled\": $kvpEnabled, \"kvpCanEdit\": $kvpCanEdit, \"kvpCanMove\": $kvpCanMove";
-  my $menuIsEnabled = $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{UseContextMenu} || 0;
-  my $topicInteraction = $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{TopicInteraction} || 0;
+  my $enabled = $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{UseContextMenu} || 0;
+  $prefs{useContextMenu} = $enabled ? JSON::true : JSON::false;
+  my $ti = $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{TopicInteraction} || 0;
+  $prefs{useTopicInteraction} = $ti ? JSON::true : JSON::false;
   my $newWindow = Foswiki::Func::getPreferencesValue("MODAC_CONTEXT_BLANK") || 0;
-  $newWindow = 1 if ( $newWindow =~ /^(1|on|true|enabled?)/i);
+  $prefs{newWindow} = JSON::true if ( $newWindow =~ /^(1|on|true|enabled?)/i);
 
+  my $json = JSON::to_json(\%prefs);
   Foswiki::Func::addToZone(
     "script",
     "MODACCONTEXTMENUPLUGIN:PREFS",
-    "<script type='text/javascript'>jQuery.extend( foswiki.preferences, { \"contextMenu\": { $kvpPrefs, $davPrefs, \"newWindow\": $newWindow ,\"trashWeb\": \"%TRASHWEB%\", \"useContextMenu\": $menuIsEnabled, \"useTopicInteraction\": $topicInteraction } } );</script>",
-    "JQUERYPLUGIN::FOSWIKI::PREFERENCES" );
+    "<script type='text/javascript'>jQuery.extend( foswiki.preferences, {\"contextMenu\": $json});</script>",
+    "JQUERYPLUGIN::FOSWIKI::PREFERENCES");
 }
 
 sub _getLockDb {
