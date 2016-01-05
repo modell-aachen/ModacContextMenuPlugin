@@ -26,7 +26,13 @@ var ContextMenu = function() {
 
     var kvpIsEnabled = prefs.kvpIsEnabled;
     var kvpCanEdit = kvpIsEnabled ? prefs.kvpCanEdit : true;
-    var kvpCanMove = kvpIsEnabled ? prefs.kvpCanMove : true;
+    var kvpCanMove = kvpCanEdit;
+
+    /**
+     * Permissions
+     */
+
+    var canDelete = prefs.canDelete;
 
 
     /**
@@ -46,7 +52,7 @@ var ContextMenu = function() {
 
     var getWebDAVUrl = function() {
         if (!prefs.davIsEnabled) return null;
-        if (!prefs.davHasUrl) {
+        if (!prefs.hasLocation) {
             $(this).logError("No WebDAV location specified.");
             return null;
         }
@@ -620,7 +626,7 @@ var ContextMenu = function() {
         var move = {
             name: lang.moveAttachment,
             icon: 'move',
-            disabled: !kvpCanMove,
+            disabled: !canDelete,
             callback: function(key, opts) {
                 var moveUrl = formatString(
                     "{0}/rename{1}/{2}/{3}?template=moveattachment&attachment={4}",

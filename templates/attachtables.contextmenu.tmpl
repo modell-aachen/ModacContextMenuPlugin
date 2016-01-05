@@ -36,12 +36,12 @@
 
 %{ Row for versions table in attach screen }%
 %{ Use %A_URL% instead of %PUBURLPATH%/%WEB%/%TOPIC%/%A_FILE% to get a viewfile link }%
-%TMPL:DEF{ATTACH:versions:row}%| %A_REV%  | <a href="%SCRIPTURL{viewfile}%/%WEB%/%TOPIC%?filename=%ENCODE{%A_FILE%}%;rev=%A_REV%">%MAKETEXT{"view"}%</a>,&nbsp; <a href="%SCRIPTURL{restore}%/%WEB%/%TOPIC%?filename=%ENCODE{%A_FILE%}%;rev=%A_REV%">%MAKETEXT{"restore"}%</a>  |  <span class="foswikiNoBreak">%A_DATE%</span>|%PRETTYUSER{"%A_USER%"}% |
+%TMPL:DEF{ATTACH:versions:row}%| %A_REV%  | <a href="%SCRIPTURL{viewfile}%/%WEB%/%TOPIC%?filename=%ENCODE{%A_FILE%}%;rev=%A_REV%">%MAKETEXT{"view"}%</a>,&nbsp; <a href="%SCRIPTURL{restore}%/%WEB%/%TOPIC%?filename=%ENCODE{%A_FILE%}%;rev=%A_REV%">%MAKETEXT{"restore"}%</a>  |  <span class="foswikiNoBreak">%A_DATE%</span>|%RENDERUSER{"%A_USER%" convert="on"}% |
 %TMPL:END%
 
 %TMPL:DEF{ATTACH:files:row(basic):buttons}%%FAVORITEBUTTON{
   default=""
-  cond="'%TOPIC%'='%WORKFLOWORIGIN%' AND $FAVORITES='1'"
+  cond="'%TOPIC%'='%WORKFLOWORIGIN%' AND $FAVORITES='1' and not context 'comparing'"
   web="%WEB%" topic="%TOPIC%" file="%A_FILE%"
   active_suffix="gold" inactive_suffix="grey"
   active_label="%MAKETEXT{"Remove bookmark"}%" inactive_label="%MAKETEXT{"Bookmark this file"}%"
@@ -50,7 +50,7 @@
 
 %{ A basic row definition, for attachment table and attach screen }%
 %{ Use %A_URL% instead of %PUBURLPATH%/%WEB%/%TOPIC%/%A_FILE% to get a viewfile link }%
-%TMPL:DEF{ATTACH:files:row(basic)}%| %TMPL:P{"ATTACH:files:row(basic):buttons"}% | %A_ICON%<span class="foswikiHidden">%A_EXT%</span> &nbsp; <a href="%ATTACHURLPATH%/%ENCODE{%A_FILE%}%"><noautolink>%A_FILE%</noautolink>&nbsp;&raquo;</a> | %A_SIZE% | <span class="foswikiNoBreak">%A_DATE%</span> | %PRETTYUSER{"%A_USER%"}% | %A_COMMENT% |%TMPL:END%
+%TMPL:DEF{ATTACH:files:row(basic)}%| %TMPL:P{"ATTACH:files:row(basic):buttons"}% | %A_ICON%<span class="foswikiHidden">%A_EXT%</span> &nbsp; <a href="%ATTACHURLPATH%/%ENCODE{%A_FILE%}%"><noautolink>%A_FILE%</noautolink>&nbsp;&raquo;</a> | %A_SIZE% | <span class="foswikiNoBreak">%A_DATE%</span> | %RENDERUSER{"%A_USER%" convert="on"}% | %A_COMMENT% |%TMPL:END%
 
 %{
   <a href='%SCRIPTURLPATH{"attach"}%/%WEB%/%TOPIC%?filename=%ENCODE{"%A_FILE%"}%;revInfo=1' title='%MAKETEXT{"Update attachment"}%' rel='follow' class="requireModacChangePermission modacChanging">
