@@ -18,6 +18,7 @@ var ContextMenu = function() {
     var scriptSuffix = foswiki.getPreference('SCRIPTSUFFIX');
     var web = foswiki.getPreference('WEB');
     var topic = foswiki.getPreference('TOPIC');
+    var uriSchemes = prefs.uriSchemes;
 
 
     /**
@@ -284,6 +285,20 @@ var ContextMenu = function() {
         return false;
     };
 
+    // Use Office protocol handlers to open documents
+    // see https://msdn.microsoft.com/en-us/library/office/dn906146.aspx
+    var webdavInvokeByURISchema = function(officeComponent, url, isTemplate) {
+        var cmd = isTemplate ? 'nft' : 'ofe';
+        var parts = officeComponent.split('.');
+        var app = parts[0].toLowerCase();
+
+        if (/msproject/i.test(app)) {
+            app = 'project';
+        }
+
+        window.location = ['ms-', app, ':', cmd, '|u|', url].join('');
+    };
+
     // Start Office app by using ActiveX
     // see http://msdn.microsoft.com/de-de/library/ie/7sw4ddf8(v=vs.94).aspx
     // IE only
@@ -316,15 +331,20 @@ var ContextMenu = function() {
                     docType = launcher[parts[1]];
                 }
 
-                if (docType != null) {
-                    launcher.Visible = true;
+                try {
+                    if (docType != null) {
+                        launcher.Visible = true;
 
-                    if (isTemplate) {
-                        docType.Add(url);
-                    } else {
-                        docType.Open(url);
+                        if (isTemplate) {
+                            docType.Add(url);
+                        } else {
+                            docType.Open(url);
+                        }
                     }
-
+                } catch (e) {
+                    if (window.console && console.error) {
+                        console.error(e);
+                    }
                 }
         }
 
@@ -424,6 +444,11 @@ var ContextMenu = function() {
                     var newTopic = topic + '_files'; // hard corded in FilesysVirtual
                     var davHref = href.replace(topic, newTopic).replace(pubPath, davUrl + '/' + token);
                     davHref = decodeURI( davHref );
+
+                    if (uriSchemes) {
+                        webdavInvokeByURISchema(component, davHref, false)
+                        return;
+                    }
 
                     if (isIE) {
                         return webdavInvokeIE(component, davHref, false);
