@@ -19,6 +19,8 @@ var ContextMenu = function() {
     var web = foswiki.getPreference('WEB');
     var topic = foswiki.getPreference('TOPIC');
     var uriSchemes = prefs.uriSchemes;
+    var moveHidden = prefs.disableMove;
+    var renameHidden = prefs.disableRename;
 
 
     /**
@@ -652,6 +654,7 @@ var ContextMenu = function() {
             name: lang.moveAttachment,
             icon: 'move',
             disabled: !canDelete,
+            visible: !moveHidden,
             callback: function(key, opts) {
                 var moveUrl = formatString(
                     "{0}/rename{1}/{2}/{3}?template=moveattachment&attachment={4}",
@@ -716,6 +719,7 @@ var ContextMenu = function() {
             name: lang.renameAttachment,
             icon: 'rename',
             disabled: !kvpCanEdit,
+            visible: !renameHidden,
             callback: function(key, opts) {
                 var moveUrl = formatString(
                     "{0}/rename{1}/{2}/{3}?template=moveattachment&attachment={4}",
@@ -910,6 +914,7 @@ var ContextMenu = function() {
             }
         };
 
+        // ToDo. cleanup after upgrade of jquery.contextmenu.js
         var defaultItems = [
             edit,
             fromTemplate,
@@ -918,14 +923,20 @@ var ContextMenu = function() {
             '---------',
             newversion,
             versions,
-            '---------',
-            move,
-            rename,
-            remove,
-            '---------',
-            comment
+            '---------'
         ];
 
+        if (!moveHidden) {
+            defaultItems.push(move);
+        }
+
+        if (!renameHidden) {
+            defaultItems.push(rename);
+        }
+
+        defaultItems.push(remove)
+        defaultItems.push('---------')
+        defaultItems.push(comment)
 
         /*
          * locked menu
@@ -964,12 +975,14 @@ var ContextMenu = function() {
         var moveLocked = {
             name: lang.moveAttachment,
             disabled: true,
+            visible: !moveHidden, // requires update of jquery.contextMenu.js (>= 2.0)
             icon: 'locked'
         };
 
         var renameLocked = {
             name: lang.renameAttachment,
             disabled: true,
+            visible: !renameHidden, // requires update of jquery.contextMenu.js (>= 2.0)
             icon: 'locked'
         };
 
@@ -1045,6 +1058,7 @@ var ContextMenu = function() {
             }
         }
 
+        // ToDo. cleanup after upgrade of jquery.contextmenu.js
         var lockedItems = [
             editLocked,
             fromTemplate,
@@ -1053,13 +1067,20 @@ var ContextMenu = function() {
             '---------',
             newversionLocked,
             versionsLocked,
-            '---------',
-            moveLocked,
-            renameLocked,
-            deleteLocked,
-            '---------',
-            commentLocked
+            '---------'
         ];
+
+        if (!moveHidden) {
+            lockedItems.push(moveLocked);
+        }
+
+        if (!renameHidden) {
+            lockedItems.push(renameLocked);
+        }
+
+        lockedItems.push(deleteLocked);
+        lockedItems.push('---------');
+        lockedItems.push(commentLocked);
 
 
         // build the context menu each time the user clicks an (attachtable) entry.

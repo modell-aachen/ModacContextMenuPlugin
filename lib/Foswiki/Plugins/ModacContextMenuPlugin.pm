@@ -163,6 +163,8 @@ sub _attachPrefs {
 
   my $trash = $Foswiki::cfg{TrashWebName} || 'Trash';
   my $uriSchemes = $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{OfficeURISchemes} || 0;
+  my $disableMove = $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{DisableActionMove} || 0;
+  my $disableRename = $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{DisableActionRename} || 0;
   my $ctx = Foswiki::Func::getContext();
   my %prefs = (
     kvpIsEnabled => Foswiki::isTrue($ctx->{'KVPControlled'}, 0) ? JSON::true : JSON::false,
@@ -173,7 +175,9 @@ sub _attachPrefs {
     trashWeb => $trash,
     canEdit => JSON::false,
     canDelete => JSON::false,
-    uriSchemes => $uriSchemes ? JSON::true : JSON::false
+    uriSchemes => $uriSchemes ? JSON::true : JSON::false,
+    disableMove => $disableMove ? JSON::true : JSON::false,
+    disableRename => $disableRename ? JSON::true : JSON::false
   );
 
   my $session = $Foswiki::Plugins::SESSION;
