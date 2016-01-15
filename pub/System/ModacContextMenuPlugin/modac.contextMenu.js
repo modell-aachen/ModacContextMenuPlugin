@@ -1203,7 +1203,7 @@ var ContextMenu = function() {
 
         if (!cm.topicInteraction) {
             var table = $('div.foswikiAttachments').find('table');
-            var tds = $(table).find('td.foswikiTableCol1');
+            var tds = $(table).find('td.foswikiTableCol1,td.attachmentLink');
             $.each(tds, function(i, e) {
                 menu.attachContextMenu(e);
             });
