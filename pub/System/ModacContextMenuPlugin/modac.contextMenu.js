@@ -379,7 +379,7 @@ var ContextMenu = function() {
         var filename;
         var match = pattern.exec(href);
         if (match != null && match.length > 1) {
-            filename = match[1];
+            filename = match[1].replace(/\?.*/, '');
         } else {
             // will produce HTTP 500 -> error dialog
             filename = '#';
@@ -389,13 +389,13 @@ var ContextMenu = function() {
         var component, componentName, extension;
         for (var app in apps) {
             var exts = new RegExp("\\.(" + apps[app] + ")$", 'i');
-            if (exts.test(href)) {
+            if (exts.test(filename)) {
                 hasHandler = true;
                 componentName = app.split('.')[0];
                 component = app;
 
                 try {
-                    extension = href.match(exts)[1];
+                    extension = filename.match(exts)[1];
                 } catch (e) {
                     extension = null;
                 }
@@ -411,7 +411,7 @@ var ContextMenu = function() {
             isTemplate = templates.test(extension);
         }
 
-        var isEditEnabled = davEnabledBrowser && hasApps && kvpCanEdit && hasDavUrl && hasHandler;
+        var isEditEnabled = davEnabledBrowser && hasApps && kvpCanEdit && hasDavUrl && hasHandler && !/\?/.test(href);
 
         /*
          * regular menu
