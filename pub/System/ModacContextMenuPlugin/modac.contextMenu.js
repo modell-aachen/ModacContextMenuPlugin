@@ -912,7 +912,7 @@ var ContextMenu = function() {
 
         var defaultItems = [
             edit,
-            fromTemplate,
+            // fromTemplate,
             '---------',
             download,
             '---------',
@@ -1047,7 +1047,7 @@ var ContextMenu = function() {
 
         var lockedItems = [
             editLocked,
-            fromTemplate,
+            // fromTemplate,
             '---------',
             downloadLocked,
             '---------',
