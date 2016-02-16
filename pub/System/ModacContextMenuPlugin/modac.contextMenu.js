@@ -21,6 +21,12 @@ var ContextMenu = function() {
     var uriSchemes = prefs.uriSchemes;
     var moveHidden = prefs.disableMove;
     var renameHidden = prefs.disableRename;
+    var editHidden = prefs.disableEdit;
+    var downloadHidden = prefs.disableDownload;
+    var newVersionHidden = prefs.disableNewVersion;
+    var historyHidden = prefs.disableHistory;
+    var removeHidden = prefs.disableRemove;
+    var commentHidden = prefs.disableComment;
 
 
     /**
@@ -418,659 +424,665 @@ var ContextMenu = function() {
         /*
          * regular menu
          */
-        var edit = {
-            name: isEditEnabled ? formatString(lang.editAttachmentIn, componentName) : lang.editAttachment,
-            icon: 'edit',
-            disabled: !isEditEnabled,
-            callback: function(key, opts) {
-                if (window.kvpDiscussionConfirmation && !window.kvpDiscussionConfirmation()) return false;
+        var defaultItems = [];
+        var lockedItems = [];
 
-                var restUrl = formatString(
-                    "{0}/rest{1}/ModacContextMenuPlugin/tokenizer?w={2}&t={3}&a={4}",
-                    binPath,
-                    scriptSuffix,
-                    web,
-                    topic,
-                    filename
-                );
+        if (!editHidden) {
+            var edit = {
+                name: isEditEnabled ? formatString(lang.editAttachmentIn, componentName) : lang.editAttachment,
+                icon: 'edit',
+                disabled: !isEditEnabled,
+                callback: function(key, opts) {
+                    if (window.kvpDiscussionConfirmation && !window.kvpDiscussionConfirmation()) return false;
 
-                $.ajax({url: restUrl, cache: false}).done(function(data, status, xhr) {
-                    var token = xhr.getResponseHeader('X-MA-TOKEN');
-                    if (!token) {
-                        if (window.console && window.console.error) {
-                            console.error('Missing token!');
+                    var restUrl = formatString(
+                        "{0}/rest{1}/ModacContextMenuPlugin/tokenizer?w={2}&t={3}&a={4}",
+                        binPath,
+                        scriptSuffix,
+                        web,
+                        topic,
+                        filename
+                    );
+
+                    $.ajax({url: restUrl, cache: false}).done(function(data, status, xhr) {
+                        var token = xhr.getResponseHeader('X-MA-TOKEN');
+                        if (!token) {
+                            if (window.console && window.console.error) {
+                                console.error('Missing token!');
+                            }
+                            return;
                         }
-                        return;
-                    }
 
-                    var newTopic = topic + '_files'; // hard corded in FilesysVirtual
-                    var davHref = href.replace(topic, newTopic).replace(pubPath, davUrl + '/' + token);
-                    davHref = decodeURI( davHref );
+                        var newTopic = topic + '_files'; // hard corded in FilesysVirtual
+                        var davHref = href.replace(topic, newTopic).replace(pubPath, davUrl + '/' + token);
+                        davHref = decodeURI( davHref );
 
-                    if (uriSchemes) {
-                        webdavInvokeByURISchema(component, davHref, false)
-                        return;
-                    }
+                        if (uriSchemes) {
+                            webdavInvokeByURISchema(component, davHref, false)
+                            return;
+                        }
 
-                    if (isIE) {
-                        return webdavInvokeIE(component, davHref, false);
-                    }
+                        if (isIE) {
+                            return webdavInvokeIE(component, davHref, false);
+                        }
 
-                    var dispatch = function() {
-                        var div = document.getElementById('hiddenContainer');
-                        var a = document.createElement('a');
+                        var dispatch = function() {
+                            var div = document.getElementById('hiddenContainer');
+                            var a = document.createElement('a');
 
-                        a.setAttribute('href', davHref);
-                        div.appendChild(a);
+                            a.setAttribute('href', davHref);
+                            div.appendChild(a);
 
-                        a.onclick = function(e) {
-                            return webdavInvoke(e);
+                            a.onclick = function(e) {
+                                return webdavInvoke(e);
+                            };
+
+                            a.click();
                         };
 
-                        a.click();
-                    };
-
-                    if (isFirefox) {
-                       self.checkFirefoxAddOn()
-                            .done(dispatch)
-                            .fail(createFirefoxAddonDialog);
-                       return;
-                    }
-
-                    if (isChrome) {
-                        self.checkChromeAddOn()
-                            .done(dispatch)
-                            .fail(createChromeAddonDialog);
-                       return;
-                    }
-                }).fail(function(xhr, status, err) {
-                    if (window.console && window.console.error) {
-                        console.error('Acquiring token failed!');
-                        console.error(err);
-                    }
-                });
-            }
-        };
-
-        var download = {
-            name: lang.downloadAttachment,
-            icon: 'download',
-            callback: function(key, opts) {
-                var cm = foswiki.getPreference('contextMenu');
-                if ( cm.newWindow ) {
-                    window.open(href);
-                } else {
-                    window.location.href = href;
-                }
-            }
-        };
-
-        var newversion = {
-            name: lang.newVersion,
-            icon: 'newversion',
-            disabled: !kvpCanEdit,
-            callback: function(key, opts) {
-                if (window.kvpDiscussionConfirmation && !window.kvpDiscussionConfirmation()) return false;
-                var attachUrl = formatString(
-                    "{0}/attach{1}/{2}/{3}?filename={4}",
-                    binPath,
-                    scriptSuffix,
-                    encodeURI(web),
-                    encodeURI(topic),
-                    filename
-                );
-
-                blockUI();
-                $.ajax({
-                    url: attachUrl,
-                    complete: function(xhr, status) {
-                        $.unblockUI();
-                    },
-                    error: function(xhr, status, error) {
-                        createErrorDialog();
-                        window.console && console.log(error);
-                    },
-                    success: function(page, status, xhr) {
-                        if (isLoginForm(page)) return;
-                        var form = $(page).find('form.modacUpload');
-
-                        // only allow files with same file extension
-                        var name = form.find('input[name="filename"]:first').val();
-                        var ext;
-                        if (name !== undefined) ext = /(\.[^.]+)/.exec(name);
-                        if (ext) {
-                            form.find('input[name="filepath"]').each(function() {
-                                var $this = $(this);
-                                var name = $this.val();
-                                if (($this).prop('accept')) return;
-                                $this.attr('accept', ext[1]);
-                            });
+                        if (isFirefox) {
+                           self.checkFirefoxAddOn()
+                                .done(dispatch)
+                                .fail(createFirefoxAddonDialog);
+                           return;
                         }
 
-                        var d = $('<div></div>');
-                        $(form).appendTo(d);
+                        if (isChrome) {
+                            self.checkChromeAddOn()
+                                .done(dispatch)
+                                .fail(createChromeAddonDialog);
+                           return;
+                        }
+                    }).fail(function(xhr, status, err) {
+                        if (window.console && window.console.error) {
+                            console.error('Acquiring token failed!');
+                            console.error(err);
+                        }
+                    });
+                }
+            };
 
-                        $(d).find('div.patternBorder').hide();
-                        $(d).find('div.foswikiFormStep.foswikiLast').hide();
+            var editLocked = {
+                name: hasHandler ? formatString(lang.editAttachmentIn, componentName) : lang.editAttachment,
+                icon: 'locked',
+                disabled: true
+            };
 
-                        $(d).dialog({
-                            title: lang.newVersionDialogTitle,
-                            closeOnEscape: true,
-                            modal: true,
-                            minWidth: 600,
-                            minHeight: 315,
-                            show: {
-                                effect: 'fade',
-                                duration: 500
-                            },
-                            hide: {
-                                effect: 'fade',
-                                duration: 300
-                            },
-                            buttons: [{
-                                text: lang.btnUploadText,
-                                click: function() {
-                                    $(d).find('input.foswikiSubmit').click();
-                                    $(this).dialog('close');
-                                }
-                            }, {
-                                text: lang.btnCancelText,
-                                click: function() {
-                                    $(this).dialog('close');
-                                }
-                            }]
-                        });
+            defaultItems.push(edit);
+            defaultItems.push('---------');
+            lockedItems.push(editLocked);
+            lockedItems.push('---------');
+        }
+
+        if (!downloadHidden) {
+            var download = {
+                name: lang.downloadAttachment,
+                icon: 'download',
+                callback: function(key, opts) {
+                    var cm = foswiki.getPreference('contextMenu');
+                    if ( cm.newWindow ) {
+                        window.open(href);
+                    } else {
+                        window.location.href = href;
                     }
-                });
-            }
-        };
+                }
+            };
 
-        var versions = {
-            name: lang.manageVersions,
-            icon: 'versions',
-            disabled: !kvpCanEdit,
-            callback: function(key, opts) {
-                var attachUrl = formatString(
-                    "{0}/attach{1}/{2}/{3}?filename={4}",
-                    binPath,
-                    scriptSuffix,
-                    encodeURI(web),
-                    encodeURI(topic),
-                    filename
-                );
-
-                blockUI();
-                $.ajax({
-                    url: attachUrl,
-                    complete: function(xhr, status) {
-                        $.unblockUI();
-                    },
-                    error: function(xhr, status, error) {
-                        createErrorDialog();
-                        logError(error);
-                    },
-                    success: function(page, status, xhr) {
-                        if (isLoginForm(page)) return;
-                        var form = $(page).find('div.foswikiAttachments');
-                        var d = $('<div></div>');
-                        $(d).html(form);
-
-                        $(d).dialog({
-                            title: formatString(lang.manageVersionsDialogTitle, decodeURIComponent(filename)),
-                            closeOnEscape: true,
-                            modal: true,
-                            minWidth: 700,
-                            minHeight: 190,
-                            show: {
-                                effect: 'fade',
-                                duration: 500
-                            },
-                            hide: {
-                                effect: 'fade',
-                                duration: 300
-                            },
-                            buttons: [{
-                                text: lang.btnCloseText,
-                                click: function() {
-                                    $(this).dialog('close');
-                                }
-                            }]
-                        });
+            var downloadLocked = {
+                name: lang.downloadAttachment,
+                icon: 'download',
+                callback: function(key, opts) {
+                    var cm = foswiki.getPreference('contextMenu');
+                    if ( cm.newWindow ) {
+                        window.open(href);
+                    } else {
+                        window.location.href = href;
                     }
-                });
-            }
-        };
+                }
+            };
 
-        var move = {
-            name: lang.moveAttachment,
-            icon: 'move',
-            disabled: !canDelete,
-            visible: !moveHidden,
-            callback: function(key, opts) {
-                var moveUrl = formatString(
-                    "{0}/rename{1}/{2}/{3}?template=moveattachment&attachment={4}",
-                    binPath,
-                    scriptSuffix,
-                    encodeURI(web),
-                    encodeURI(topic),
-                    filename
-                );
+            defaultItems.push(download);
+            defaultItems.push('---------');
+            lockedItems.push(downloadLocked);
+            lockedItems.push('---------');
+        }
 
-                blockUI();
-                $.ajax({
-                    url: moveUrl,
-                    complete: function(xhr, status) {
-                        $.unblockUI();
-                    },
-                    error: function(xhr, status, error) {
-                        createErrorDialog();
-                        window.console && console.log(error);
-                    },
-                    success: function(page, status, xhr) {
-                        if (isLoginForm(page)) return;
-                        var form = $(page).find('form').last();
-                        $(form).find('div.patternBorder').hide();
-                        $(form).find('div.foswikiFormSteps').children().first().hide();
-                        var d = $('<div></div>');
-                        $(form).appendTo(d);
-
-                        $(d).dialog({
-                            title: formatString(lang.moveAttachmentDialogTitle, decodeURIComponent(filename)),
-                            closeOnEscape: true,
-                            modal: true,
-                            minWidth: 700,
-                            minHeight: 190,
-                            show: {
-                                effect: 'fade',
-                                duration: 500
-                            },
-                            hide: {
-                                effect: 'fade',
-                                duration: 300
-                            },
-                            buttons: [{
-                                text: lang.btnMoveText,
-                                click: function() {
-                                    $(form).find('input.foswikiSubmit').click();
-                                    $(this).dialog('close');
-                                }
-                            }, {
-                                text: lang.btnCancelText,
-                                click: function() {
-                                    $(this).dialog('close');
-                                }
-                            }]
-                        });
-                    }
-                });
-            }
-        };
-
-        var rename = {
-            name: lang.renameAttachment,
-            icon: 'rename',
-            disabled: !kvpCanEdit,
-            visible: !renameHidden,
-            callback: function(key, opts) {
-                var moveUrl = formatString(
-                    "{0}/rename{1}/{2}/{3}?template=moveattachment&attachment={4}",
-                    binPath,
-                    scriptSuffix,
-                    encodeURI(web),
-                    encodeURI(topic),
-                    filename
-                );
-
-                blockUI();
-                $.ajax({
-                    url: moveUrl,
-                    complete: function(xhr, status) {
-                        $.unblockUI();
-                    },
-                    error: function(xhr, status, error) {
-                        createErrorDialog();
-                        window.console && console.log(error);
-                    },
-                    success: function(page, status, xhr) {
-                        if (isLoginForm(page)) return;
-                        var form = $(page).find('form').last();
-                        $(form).find('div.patternBorder').hide();
-                        $(form).find('div.foswikiFormStep:lt(3)').hide();
-                        $(form).find('input.foswikiInputField').first().val(topic);
-                        var d = $('<div></div>');
-                        $(form).appendTo(d);
-
-                        $(d).dialog({
-                            title: formatString(lang.renameAttachmentDialogTitle, decodeURIComponent(filename)),
-                            closeOnEscape: true,
-                            modal: true,
-                            minWidth: 700,
-                            minHeight: 190,
-                            show: {
-                                effect: 'fade',
-                                duration: 500
-                            },
-                            hide: {
-                                effect: 'fade',
-                                duration: 300
-                            },
-                            buttons: [{
-                                text: lang.btnRenameText,
-                                click: function() {
-                                    $(form).find('input.foswikiSubmit').click();
-                                    $(this).dialog('close');
-                                }
-                            }, {
-                                text: lang.btnCancelText,
-                                click: function() {
-                                    $(this).dialog('close');
-                                }
-                            }]
-                        });
-                    }
-                });
-            }
-        };
-
-        var remove = {
-            name: lang.deleteAttachment,
-            icon: 'delete',
-            disabled: !kvpCanMove,
-            callback: function(key, opts) {
-                var trashWeb = foswiki.getPreference('contextMenu').trashWeb;
-                if ( !deleteUrl || /^[\s\r\n]*$/.test(deleteUrl) ) {
-                    deleteUrl = formatString(
-                        "{0}/rename{1}/{2}/{3}?newweb={4};newtopic=TrashAttachment;template=renameattachmentdelete;attachment={5}",
+        if (!newVersionHidden) {
+            var newversion = {
+                name: lang.newVersion,
+                icon: 'newversion',
+                disabled: !kvpCanEdit,
+                callback: function(key, opts) {
+                    if (window.kvpDiscussionConfirmation && !window.kvpDiscussionConfirmation()) return false;
+                    var attachUrl = formatString(
+                        "{0}/attach{1}/{2}/{3}?filename={4}",
                         binPath,
                         scriptSuffix,
                         encodeURI(web),
                         encodeURI(topic),
-                        trashWeb,
                         filename
                     );
+
+                    blockUI();
+                    $.ajax({
+                        url: attachUrl,
+                        complete: function(xhr, status) {
+                            $.unblockUI();
+                        },
+                        error: function(xhr, status, error) {
+                            createErrorDialog();
+                            window.console && console.log(error);
+                        },
+                        success: function(page, status, xhr) {
+                            if (isLoginForm(page)) return;
+                            var form = $(page).find('form.modacUpload');
+
+                            // only allow files with same file extension
+                            var name = form.find('input[name="filename"]:first').val();
+                            var ext;
+                            if (name !== undefined) ext = /(\.[^.]+)/.exec(name);
+                            if (ext) {
+                                form.find('input[name="filepath"]').each(function() {
+                                    var $this = $(this);
+                                    var name = $this.val();
+                                    if (($this).prop('accept')) return;
+                                    $this.attr('accept', ext[1]);
+                                });
+                            }
+
+                            var d = $('<div></div>');
+                            $(form).appendTo(d);
+
+                            $(d).find('div.patternBorder').hide();
+                            $(d).find('div.foswikiFormStep.foswikiLast').hide();
+
+                            $(d).dialog({
+                                title: lang.newVersionDialogTitle,
+                                closeOnEscape: true,
+                                modal: true,
+                                minWidth: 600,
+                                minHeight: 315,
+                                show: {
+                                    effect: 'fade',
+                                    duration: 500
+                                },
+                                hide: {
+                                    effect: 'fade',
+                                    duration: 300
+                                },
+                                buttons: [{
+                                    text: lang.btnUploadText,
+                                    click: function() {
+                                        $(d).find('input.foswikiSubmit').click();
+                                        $(this).dialog('close');
+                                    }
+                                }, {
+                                    text: lang.btnCancelText,
+                                    click: function() {
+                                        $(this).dialog('close');
+                                    }
+                                }]
+                            });
+                        }
+                    });
                 }
+            };
 
-                blockUI();
-                $.ajax({
-                    url: deleteUrl,
-                    complete: function(xhr, status) {
-                        $.unblockUI();
-                    },
-                    error: function(xhr, status, error) {
-                        createErrorDialog();
-                        window.console && console.log(error);
-                    },
-                    success: function(page, status, xhr) {
-                        if (isLoginForm(page)) return;
-                        var d = $(formatString('<div>{0}</div>', lang.deleteAttachmentDialogText));
-                        var form = $(page).find('form');
-                        $(form).hide();
-                        $(form).appendTo(d);
+            var newversionLocked = {
+                name: lang.newVersion,
+                disabled: true,
+                icon: 'locked'
+            };
 
-                        $(d).dialog({
-                            title: formatString(lang.deleteAttachmentDialogTitle, decodeURIComponent(filename)),
-                            closeOnEscape: true,
-                            modal: true,
-                            width: 450,
-                            height: 150,
-                            show: {
-                                effect: 'fade',
-                                duration: 500
-                            },
-                            hide: {
-                                effect: 'fade',
-                                duration: 300
-                            },
-                            buttons: [{
-                                text: lang.btnDeleteText,
-                                click: function() {
-                                    $(form).find('input.foswikiSubmit').click();
-                                    $(this).dialog('close');
-                                }
-                            }, {
-                                text: lang.btnCancelText,
-                                click: function() {
-                                    $(this).dialog('close');
-                                }
-                            }]
-                        });
-                    }
-                });
+            defaultItems.push(newversion);
+            lockedItems.push(newversionLocked);
+
+            if (historyHidden) {
+                defaultItems.push('---------');
+                lockedItems.push('---------');
             }
-        };
+        }
 
-        var comment = {
-            name: lang.editComment,
-            icon: 'comment',
-            disabled: !kvpCanEdit,
-            callback: function(key, opts) {
-                var attachUrl = formatString(
-                    "{0}/attach{1}/{2}/{3}?filename={4}",
-                    binPath,
-                    scriptSuffix,
-                    encodeURI(web),
-                    encodeURI(topic),
-                    filename
-                );
+        if (!historyHidden) {
+            var versions = {
+                name: lang.manageVersions,
+                icon: 'versions',
+                disabled: !kvpCanEdit,
+                callback: function(key, opts) {
+                    var attachUrl = formatString(
+                        "{0}/attach{1}/{2}/{3}?filename={4}",
+                        binPath,
+                        scriptSuffix,
+                        encodeURI(web),
+                        encodeURI(topic),
+                        filename
+                    );
 
-                blockUI();
-                $.ajax({
-                    url: attachUrl,
-                    complete: function(xhr, status) {
-                        $.unblockUI();
-                    },
-                    error: function(xhr, status, error) {
-                        createErrorDialog();
-                        window.console && console.log(error);
-                    },
-                    success: function(page, status, xhr) {
-                        if (isLoginForm(page)) return;
-                        var form = $(page).find('form.modacUpload');
-                        $(form).find('div.patternBorder').hide();
-                        var steps = $(form).find('div.foswikiFormSteps').children();
-                        $(steps).first().hide();
-                        $(steps).last().hide();
-                        var d = $('<div></div>');
-                        $(form).appendTo(d);
+                    blockUI();
+                    $.ajax({
+                        url: attachUrl,
+                        complete: function(xhr, status) {
+                            $.unblockUI();
+                        },
+                        error: function(xhr, status, error) {
+                            createErrorDialog();
+                            logError(error);
+                        },
+                        success: function(page, status, xhr) {
+                            if (isLoginForm(page)) return;
+                            var form = $(page).find('div.foswikiAttachments');
+                            var d = $('<div></div>');
+                            $(d).html(form);
 
-                        $(d).dialog({
-                            title: lang.editCommentDialogTitle,
-                            closeOnEscape: true,
-                            modal: true,
-                            minWidth: 600,
-                            minHeight: 150,
-                            show: {
-                                effect: 'fade',
-                                duration: 500
-                            },
-                            hide: {
-                                effect: 'fade',
-                                duration: 300
-                            },
-                            buttons: [{
-                                text: lang.btnSaveText,
-                                click: function() {
-                                    $(d).find('input.modacChanging').click();
-                                    $(this).dialog('close');
-                                }
-                            }, {
-                                text: lang.btnCancelText,
-                                click: function() {
-                                    $(this).dialog('close');
-                                }
-                            }]
-                        });
-                    }
-                });
-            }
-        };
+                            $(d).dialog({
+                                title: formatString(lang.manageVersionsDialogTitle, decodeURIComponent(filename)),
+                                closeOnEscape: true,
+                                modal: true,
+                                minWidth: 700,
+                                minHeight: 190,
+                                show: {
+                                    effect: 'fade',
+                                    duration: 500
+                                },
+                                hide: {
+                                    effect: 'fade',
+                                    duration: 300
+                                },
+                                buttons: [{
+                                    text: lang.btnCloseText,
+                                    click: function() {
+                                        $(this).dialog('close');
+                                    }
+                                }]
+                            });
+                        }
+                    });
+                }
+            };
 
-        // ToDo. cleanup after upgrade of jquery.contextmenu.js
-        var defaultItems = [
-            edit,
-            '---------',
-            download,
-            '---------',
-            newversion,
-            versions,
-            '---------'
-        ];
+            var versionsLocked = {
+                name: lang.manageVersions,
+                disabled: true,
+                icon: 'locked'
+            };
+
+            defaultItems.push(versions);
+            defaultItems.push('---------');
+            lockedItems.push(versionsLocked);
+            lockedItems.push('---------');
+        }
 
         if (!moveHidden) {
+            var move = {
+                name: lang.moveAttachment,
+                icon: 'move',
+                disabled: !canDelete,
+                visible: !moveHidden,
+                callback: function(key, opts) {
+                    var moveUrl = formatString(
+                        "{0}/rename{1}/{2}/{3}?template=moveattachment&attachment={4}",
+                        binPath,
+                        scriptSuffix,
+                        encodeURI(web),
+                        encodeURI(topic),
+                        filename
+                    );
+
+                    blockUI();
+                    $.ajax({
+                        url: moveUrl,
+                        complete: function(xhr, status) {
+                            $.unblockUI();
+                        },
+                        error: function(xhr, status, error) {
+                            createErrorDialog();
+                            window.console && console.log(error);
+                        },
+                        success: function(page, status, xhr) {
+                            if (isLoginForm(page)) return;
+                            var form = $(page).find('form').last();
+                            $(form).find('div.patternBorder').hide();
+                            $(form).find('div.foswikiFormSteps').children().first().hide();
+                            var d = $('<div></div>');
+                            $(form).appendTo(d);
+
+                            $(d).dialog({
+                                title: formatString(lang.moveAttachmentDialogTitle, decodeURIComponent(filename)),
+                                closeOnEscape: true,
+                                modal: true,
+                                minWidth: 700,
+                                minHeight: 190,
+                                show: {
+                                    effect: 'fade',
+                                    duration: 500
+                                },
+                                hide: {
+                                    effect: 'fade',
+                                    duration: 300
+                                },
+                                buttons: [{
+                                    text: lang.btnMoveText,
+                                    click: function() {
+                                        $(form).find('input.foswikiSubmit').click();
+                                        $(this).dialog('close');
+                                    }
+                                }, {
+                                    text: lang.btnCancelText,
+                                    click: function() {
+                                        $(this).dialog('close');
+                                    }
+                                }]
+                            });
+                        }
+                    });
+                }
+            };
+
+            var moveLocked = {
+                name: lang.moveAttachment,
+                disabled: true,
+                visible: !moveHidden, // requires update of jquery.contextMenu.js (>= 2.0)
+                icon: 'locked'
+            };
+
             defaultItems.push(move);
-        }
-
-        if (!renameHidden) {
-            defaultItems.push(rename);
-        }
-
-        defaultItems.push(remove)
-        defaultItems.push('---------')
-        defaultItems.push(comment)
-
-        /*
-         * locked menu
-         */
-        var editLocked = {
-            name: hasHandler ? formatString(lang.editAttachmentIn, componentName) : lang.editAttachment,
-            icon: 'locked',
-            disabled: true
-        };
-
-        var downloadLocked = {
-            name: lang.downloadAttachment,
-            icon: 'download',
-            callback: function(key, opts) {
-                var cm = foswiki.getPreference('contextMenu');
-                if ( cm.newWindow ) {
-                    window.open(href);
-                } else {
-                    window.location.href = href;
-                }
-            }
-        };
-
-        var newversionLocked = {
-            name: lang.newVersion,
-            disabled: true,
-            icon: 'locked'
-        };
-
-        var versionsLocked = {
-            name: lang.manageVersions,
-            disabled: true,
-            icon: 'locked'
-        };
-
-        var moveLocked = {
-            name: lang.moveAttachment,
-            disabled: true,
-            visible: !moveHidden, // requires update of jquery.contextMenu.js (>= 2.0)
-            icon: 'locked'
-        };
-
-        var renameLocked = {
-            name: lang.renameAttachment,
-            disabled: true,
-            visible: !renameHidden, // requires update of jquery.contextMenu.js (>= 2.0)
-            icon: 'locked'
-        };
-
-        var deleteLocked = {
-            name: lang.deleteAttachment,
-            disabled: true,
-            icon: 'locked'
-        };
-
-        var commentLocked = {
-            name: lang.editComment,
-            icon: 'comment',
-            disabled: !kvpCanEdit,
-            callback: function(key, opts) {
-                var attachUrl = formatString(
-                    "{0}/attach{1}/{2}/{3}?filename={4}",
-                    binPath,
-                    scriptSuffix,
-                    encodeURI(web),
-                    encodeURI(topic),
-                    filename
-                );
-
-                blockUI();
-                $.ajax({
-                    url: attachUrl,
-                    complete: function(xhr, status) {
-                        $.unblockUI();
-                    },
-                    error: function(xhr, status, error) {
-                        createErrorDialog();
-                        window.console && console.log(error);
-                    },
-                    success: function(page, status, xhr) {
-                        if (isLoginForm(page)) return;
-                        var form = $(page).find('form.modacUpload');
-                        $(form).find('div.patternBorder').hide();
-                        var steps = $(form).find('div.foswikiFormSteps').children();
-                        $(steps).first().hide();
-                        $(steps).last().hide();
-                        var d = $('<div></div>');
-                        $(form).appendTo(d);
-
-                        $(d).dialog({
-                            title: lang.editCommentDialogTitle,
-                            closeOnEscape: true,
-                            modal: true,
-                            minWidth: 600,
-                            minHeight: 150,
-                            show: {
-                                effect: 'fade',
-                                duration: 500
-                            },
-                            hide: {
-                                effect: 'fade',
-                                duration: 300
-                            },
-                            buttons: [{
-                                text: lang.btnSaveText,
-                                click: function() {
-                                    $(d).find('input.modacChanging').click();
-                                    $(this).dialog('close');
-                                }
-                            }, {
-                                text: lang.btnCancelText,
-                                click: function() {
-                                    $(this).dialog('close');
-                                }
-                            }]
-                        });
-                    }
-                });
-            }
-        }
-
-        // ToDo. cleanup after upgrade of jquery.contextmenu.js
-        var lockedItems = [
-            editLocked,
-            '---------',
-            downloadLocked,
-            '---------',
-            newversionLocked,
-            versionsLocked,
-            '---------'
-        ];
-
-        if (!moveHidden) {
             lockedItems.push(moveLocked);
         }
 
         if (!renameHidden) {
+            var rename = {
+                name: lang.renameAttachment,
+                icon: 'rename',
+                disabled: !kvpCanEdit,
+                visible: !renameHidden,
+                callback: function(key, opts) {
+                    var moveUrl = formatString(
+                        "{0}/rename{1}/{2}/{3}?template=moveattachment&attachment={4}",
+                        binPath,
+                        scriptSuffix,
+                        encodeURI(web),
+                        encodeURI(topic),
+                        filename
+                    );
+
+                    blockUI();
+                    $.ajax({
+                        url: moveUrl,
+                        complete: function(xhr, status) {
+                            $.unblockUI();
+                        },
+                        error: function(xhr, status, error) {
+                            createErrorDialog();
+                            window.console && console.log(error);
+                        },
+                        success: function(page, status, xhr) {
+                            if (isLoginForm(page)) return;
+                            var form = $(page).find('form').last();
+                            $(form).find('div.patternBorder').hide();
+                            $(form).find('div.foswikiFormStep:lt(3)').hide();
+                            $(form).find('input.foswikiInputField').first().val(topic);
+                            var d = $('<div></div>');
+                            $(form).appendTo(d);
+
+                            $(d).dialog({
+                                title: formatString(lang.renameAttachmentDialogTitle, decodeURIComponent(filename)),
+                                closeOnEscape: true,
+                                modal: true,
+                                minWidth: 700,
+                                minHeight: 190,
+                                show: {
+                                    effect: 'fade',
+                                    duration: 500
+                                },
+                                hide: {
+                                    effect: 'fade',
+                                    duration: 300
+                                },
+                                buttons: [{
+                                    text: lang.btnRenameText,
+                                    click: function() {
+                                        $(form).find('input.foswikiSubmit').click();
+                                        $(this).dialog('close');
+                                    }
+                                }, {
+                                    text: lang.btnCancelText,
+                                    click: function() {
+                                        $(this).dialog('close');
+                                    }
+                                }]
+                            });
+                        }
+                    });
+                }
+            };
+
+            var renameLocked = {
+                name: lang.renameAttachment,
+                disabled: true,
+                visible: !renameHidden, // requires update of jquery.contextMenu.js (>= 2.0)
+                icon: 'locked'
+            };
+
+            defaultItems.push(rename);
             lockedItems.push(renameLocked);
         }
 
-        lockedItems.push(deleteLocked);
-        lockedItems.push('---------');
-        lockedItems.push(commentLocked);
+        if (!removeHidden) {
+            var remove = {
+                name: lang.deleteAttachment,
+                icon: 'delete',
+                disabled: !kvpCanMove,
+                callback: function(key, opts) {
+                    var trashWeb = foswiki.getPreference('contextMenu').trashWeb;
+                    if ( !deleteUrl || /^[\s\r\n]*$/.test(deleteUrl) ) {
+                        deleteUrl = formatString(
+                            "{0}/rename{1}/{2}/{3}?newweb={4};newtopic=TrashAttachment;template=renameattachmentdelete;attachment={5}",
+                            binPath,
+                            scriptSuffix,
+                            encodeURI(web),
+                            encodeURI(topic),
+                            trashWeb,
+                            filename
+                        );
+                    }
 
+                    blockUI();
+                    $.ajax({
+                        url: deleteUrl,
+                        complete: function(xhr, status) {
+                            $.unblockUI();
+                        },
+                        error: function(xhr, status, error) {
+                            createErrorDialog();
+                            window.console && console.log(error);
+                        },
+                        success: function(page, status, xhr) {
+                            if (isLoginForm(page)) return;
+                            var d = $(formatString('<div>{0}</div>', lang.deleteAttachmentDialogText));
+                            var form = $(page).find('form');
+                            $(form).hide();
+                            $(form).appendTo(d);
+
+                            $(d).dialog({
+                                title: formatString(lang.deleteAttachmentDialogTitle, decodeURIComponent(filename)),
+                                closeOnEscape: true,
+                                modal: true,
+                                width: 450,
+                                height: 150,
+                                show: {
+                                    effect: 'fade',
+                                    duration: 500
+                                },
+                                hide: {
+                                    effect: 'fade',
+                                    duration: 300
+                                },
+                                buttons: [{
+                                    text: lang.btnDeleteText,
+                                    click: function() {
+                                        $(form).find('input.foswikiSubmit').click();
+                                        $(this).dialog('close');
+                                    }
+                                }, {
+                                    text: lang.btnCancelText,
+                                    click: function() {
+                                        $(this).dialog('close');
+                                    }
+                                }]
+                            });
+                        }
+                    });
+                }
+            };
+
+            var removeLocked = {
+                name: lang.deleteAttachment,
+                disabled: true,
+                icon: 'locked'
+            };
+
+            defaultItems.push(remove);
+            lockedItems.push(removeLocked);
+        }
+
+        if (!commentHidden) {
+            var comment = {
+                name: lang.editComment,
+                icon: 'comment',
+                disabled: !kvpCanEdit,
+                callback: function(key, opts) {
+                    var attachUrl = formatString(
+                        "{0}/attach{1}/{2}/{3}?filename={4}",
+                        binPath,
+                        scriptSuffix,
+                        encodeURI(web),
+                        encodeURI(topic),
+                        filename
+                    );
+
+                    blockUI();
+                    $.ajax({
+                        url: attachUrl,
+                        complete: function(xhr, status) {
+                            $.unblockUI();
+                        },
+                        error: function(xhr, status, error) {
+                            createErrorDialog();
+                            window.console && console.log(error);
+                        },
+                        success: function(page, status, xhr) {
+                            if (isLoginForm(page)) return;
+                            var form = $(page).find('form.modacUpload');
+                            $(form).find('div.patternBorder').hide();
+                            var steps = $(form).find('div.foswikiFormSteps').children();
+                            $(steps).first().hide();
+                            $(steps).last().hide();
+                            var d = $('<div></div>');
+                            $(form).appendTo(d);
+
+                            $(d).dialog({
+                                title: lang.editCommentDialogTitle,
+                                closeOnEscape: true,
+                                modal: true,
+                                minWidth: 600,
+                                minHeight: 150,
+                                show: {
+                                    effect: 'fade',
+                                    duration: 500
+                                },
+                                hide: {
+                                    effect: 'fade',
+                                    duration: 300
+                                },
+                                buttons: [{
+                                    text: lang.btnSaveText,
+                                    click: function() {
+                                        $(d).find('input.modacChanging').click();
+                                        $(this).dialog('close');
+                                    }
+                                }, {
+                                    text: lang.btnCancelText,
+                                    click: function() {
+                                        $(this).dialog('close');
+                                    }
+                                }]
+                            });
+                        }
+                    });
+                }
+            };
+
+            var commentLocked = {
+                name: lang.editComment,
+                icon: 'comment',
+                disabled: !kvpCanEdit,
+                callback: function(key, opts) {
+                    var attachUrl = formatString(
+                        "{0}/attach{1}/{2}/{3}?filename={4}",
+                        binPath,
+                        scriptSuffix,
+                        encodeURI(web),
+                        encodeURI(topic),
+                        filename
+                    );
+
+                    blockUI();
+                    $.ajax({
+                        url: attachUrl,
+                        complete: function(xhr, status) {
+                            $.unblockUI();
+                        },
+                        error: function(xhr, status, error) {
+                            createErrorDialog();
+                            window.console && console.log(error);
+                        },
+                        success: function(page, status, xhr) {
+                            if (isLoginForm(page)) return;
+                            var form = $(page).find('form.modacUpload');
+                            $(form).find('div.patternBorder').hide();
+                            var steps = $(form).find('div.foswikiFormSteps').children();
+                            $(steps).first().hide();
+                            $(steps).last().hide();
+                            var d = $('<div></div>');
+                            $(form).appendTo(d);
+
+                            $(d).dialog({
+                                title: lang.editCommentDialogTitle,
+                                closeOnEscape: true,
+                                modal: true,
+                                minWidth: 600,
+                                minHeight: 150,
+                                show: {
+                                    effect: 'fade',
+                                    duration: 500
+                                },
+                                hide: {
+                                    effect: 'fade',
+                                    duration: 300
+                                },
+                                buttons: [{
+                                    text: lang.btnSaveText,
+                                    click: function() {
+                                        $(d).find('input.modacChanging').click();
+                                        $(this).dialog('close');
+                                    }
+                                }, {
+                                    text: lang.btnCancelText,
+                                    click: function() {
+                                        $(this).dialog('close');
+                                    }
+                                }]
+                            });
+                        }
+                    });
+                }
+            }
+
+            defaultItems.push('---------')
+            defaultItems.push(comment)
+            lockedItems.push('---------')
+            lockedItems.push(commentLocked)
+        }
 
         // build the context menu each time the user clicks an (attachtable) entry.
         $this.contextMenu({
