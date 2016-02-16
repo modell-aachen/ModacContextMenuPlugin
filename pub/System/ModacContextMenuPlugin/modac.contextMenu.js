@@ -492,15 +492,6 @@ var ContextMenu = function() {
             }
         };
 
-        var fromTemplate = {
-            name: lang.useAsTemplate,
-            icon: 'template',
-            disabled: !(isTemplate && isIE),
-            callback: function(key, opts) {
-                return webdavInvokeIE(component, davHref, true);
-            }
-        };
-
         var download = {
             name: lang.downloadAttachment,
             icon: 'download',
@@ -917,7 +908,6 @@ var ContextMenu = function() {
         // ToDo. cleanup after upgrade of jquery.contextmenu.js
         var defaultItems = [
             edit,
-            // fromTemplate,
             '---------',
             download,
             '---------',
@@ -1061,7 +1051,6 @@ var ContextMenu = function() {
         // ToDo. cleanup after upgrade of jquery.contextmenu.js
         var lockedItems = [
             editLocked,
-            // fromTemplate,
             '---------',
             downloadLocked,
             '---------',
