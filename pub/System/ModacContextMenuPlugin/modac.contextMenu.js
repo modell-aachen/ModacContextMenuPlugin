@@ -606,7 +606,7 @@ var ContextMenu = function() {
         var move = {
             name: lang.moveAttachment,
             icon: 'move',
-            disabled: !kvpCanMove,
+            disabled: !kvpCanEdit,
             callback: function(key, opts) {
                 var moveUrl = formatString(
                     "{0}/rename{1}/{2}/{3}?template=moveattachment&attachment={4}",
