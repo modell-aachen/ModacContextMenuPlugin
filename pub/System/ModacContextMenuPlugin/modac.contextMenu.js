@@ -716,7 +716,7 @@ var ContextMenu = function() {
             var move = {
                 name: lang.moveAttachment,
                 icon: 'move',
-                disabled: !canDelete,
+                disabled: !(canDelete && kvpCanEdit),
                 visible: !moveHidden,
                 callback: function(key, opts) {
                     var moveUrl = formatString(
