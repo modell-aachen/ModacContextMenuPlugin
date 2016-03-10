@@ -820,7 +820,7 @@ var ContextMenu = function() {
                             var form = $(page).find('form').last();
                             $(form).find('div.patternBorder').hide();
                             $(form).find('div.foswikiFormStep:lt(3)').hide();
-                            $(form).find('input.foswikiInputField').first().val(topic);
+                            $(form).find('input.foswikiInputField[name="topic"]').first().val(topic);
                             var d = $('<div></div>');
                             $(form).appendTo(d);
 
