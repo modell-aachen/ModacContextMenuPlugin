@@ -21,7 +21,19 @@ In addition you may enable an _enhanced_ [[AttachTableSkin]].
 <verbatim>   * Set MODAC_CONTEXT_BLANK = 1
 </verbatim>
 
+---++ Hiding menu entries
+=ModacContextMenuPlugin= lets you configure the visibility of each entry. By default all elements are visible but you may change that behavior in =configure (_expert options_)= -> =Extensions= -> =ModacContextMenuPlugin=.
+
 ---++ !WebDAV Integration
+Since Microsoft Office 2010SP2 Microsoft introduced the so called Office URI Schemes. Basically it's a protocoll used to invoke Office straight from your webbrowser. By using those URI schemes it's not necessary to configure your browser for !WebDAV usage nor to install an extension.
+
+To use those schemes head over to =configure= and tick the following option in =ModacContextMenuPlugin= tab.
+<verbatim>
+$Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{OfficeURISchemes} = 1;
+</verbatim>
+
+The following steps are only required if you are *NOT* going to use the mechanism described above; means for IE you have to configure !ActiveX; for Firefox and Chrome you've to install an extension.
+
 ---+++ General Configuration
 %TWISTY{showlink="Show step by step guide" hidelink="Hide"}%
 <img height="536" src="%ATTACHURLPATH%/2015_11_04_11_56_061.png" width="407" />

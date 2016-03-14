@@ -165,6 +165,13 @@ sub _attachPrefs {
   my $uriSchemes = $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{OfficeURISchemes} || 0;
   my $disableMove = $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{DisableActionMove} || 0;
   my $disableRename = $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{DisableActionRename} || 0;
+  my $disableEdit = $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{DisableActionEdit} || 0;
+  my $disableDownload = $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{DisableActionDownload} || 0;
+  my $disableNewVersion = $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{DisableActionNewVersion} || 0;
+  my $disableHistory = $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{DisableActionHistory} || 0;
+  my $disableRemove = $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{DisableActionRemove} || 0;
+  my $disableComment = $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{DisableActionEditComment} || 0;
+
   my $ctx = Foswiki::Func::getContext();
   my %prefs = (
     kvpIsEnabled => Foswiki::isTrue($ctx->{'KVPControlled'}, 0) ? JSON::true : JSON::false,
@@ -176,6 +183,12 @@ sub _attachPrefs {
     canEdit => JSON::false,
     canDelete => JSON::false,
     uriSchemes => $uriSchemes ? JSON::true : JSON::false,
+    disableEdit => $disableEdit ? JSON::true : JSON::false,
+    disableDownload => $disableDownload ? JSON::true : JSON::false,
+    disableNewVersion => $disableNewVersion ? JSON::true : JSON::false,
+    disableHistory => $disableHistory ? JSON::true : JSON::false,
+    disableRemove => $disableRemove ? JSON::true : JSON::false,
+    disableComment => $disableComment ? JSON::true : JSON::false,
     disableMove => $disableMove ? JSON::true : JSON::false,
     disableRename => $disableRename ? JSON::true : JSON::false
   );

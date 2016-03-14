@@ -6,14 +6,6 @@
 $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{UseContextMenu} = 0;
 
 # **BOOLEAN**
-# Disable context menu entry 'move attachment'
-$Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{DisableActionMove} = 0;
-
-# **BOOLEAN**
-# Disable context menu entry 'rename attachment'
-$Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{DisableActionRename} = 0;
-
-# **BOOLEAN**
 # Open documents using the MS Office URI schemes.
 # Note: Minimum required Office versions: Office 2010 SP2, Office for Mac 2011
 # Further information: https://msdn.microsoft.com/en-us/library/office/dn906146.aspx
@@ -42,3 +34,28 @@ $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{WebDAVApps} = {
     'Publisher.Documents' => 'pub',
     'Project.Ignored' => 'mpd|mpp|mpt|mpw|mpx'
 };
+
+#---+++ Menu Item Visibility
+# **BOOLEAN EXPERT**
+$Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{DisableActionEdit} = 0;
+
+# **BOOLEAN EXPERT**
+$Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{DisableActionDownload} = 0;
+
+# **BOOLEAN EXPERT**
+$Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{DisableActionNewVersion} = 0;
+
+# **BOOLEAN EXPERT**
+$Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{DisableActionHistory} = 0;
+
+# **BOOLEAN EXPERT**
+$Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{DisableActionMove} = 0;
+
+# **BOOLEAN EXPERT**
+$Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{DisableActionRename} = 0;
+
+# **BOOLEAN EXPERT**
+$Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{DisableActionRemove} = 0;
+
+# **BOOLEAN EXPERT**
+$Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{DisableActionEditComment} = 0;
