@@ -52,7 +52,7 @@ var ContextMenu = function() {
         if (!prefs.davIsEnabled) return null;
         var apps = unescape(prefs.apps);
         if (apps == null || apps == '') {
-            $(this).logError("No Office apps specified.");
+            logError("No Office apps specified.");
             return null;
         }
 
@@ -62,7 +62,7 @@ var ContextMenu = function() {
     var getWebDAVUrl = function() {
         if (!prefs.davIsEnabled) return null;
         if (!prefs.hasLocation) {
-            $(this).logError("No WebDAV location specified.");
+            logError("No WebDAV location specified.");
             return null;
         }
 
@@ -283,6 +283,11 @@ var ContextMenu = function() {
         return true;
     };
 
+    var logError = function() {
+        if (window.console && console.error) {
+            console.error.apply(console, arguments);
+        }
+    };
 
     // fires an event (which will be handled by qwiki-webdav addon)
     // in order to launch Office
