@@ -654,18 +654,16 @@ var ContextMenu = function() {
                 icon: 'versions',
                 disabled: !kvpCanEdit,
                 callback: function(key, opts) {
-                    var attachUrl = formatString(
-                        "{0}/attach{1}/{2}/{3}?filename={4}",
+                    var getAttachHistoryREST = formatString(
+                        "{0}/rest/ModacContextMenuPlugin/attachHistory?w={1}&t={2}&a={3}",
                         binPath,
-                        scriptSuffix,
                         encodeURI(web),
                         encodeURI(topic),
                         filename
                     );
-
                     blockUI();
                     $.ajax({
-                        url: attachUrl,
+                        url: getAttachHistoryREST,
                         complete: function(xhr, status) {
                             $.unblockUI();
                         },
@@ -673,11 +671,9 @@ var ContextMenu = function() {
                             createErrorDialog();
                             logError(error);
                         },
-                        success: function(page, status, xhr) {
-                            if (isLoginForm(page)) return;
-                            var form = $(page).find('div.foswikiAttachments');
-                            var d = $('<div></div>');
-                            $(d).html(form);
+                        success: function(table, status, xhr) {
+                            var d = $('<div class="foswikiAttachments"></div>');
+                            $(d).html(table);
 
                             $(d).dialog({
                                 title: formatString(lang.manageVersionsDialogTitle, decodeURIComponent(filename)),
