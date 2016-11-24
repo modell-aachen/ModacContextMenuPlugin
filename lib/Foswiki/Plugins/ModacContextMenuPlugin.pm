@@ -107,6 +107,7 @@ sub _rest_attach_history {
       my $history = $session->attach->formatVersions($topic_object, %$args);
       my $history_table = $topic_object->expandMacros($history);
       $history_table =~ s/%TABLE\{[^\}]+\}%//;
+      $history_table =~ s/<a\s*href="([^"]+)">restore</<a class="foswikiRequiresChangePermission requireModacChangePermission" href="$1">restore</g;
       $response->status(200);
       return $history_table
   } else {
