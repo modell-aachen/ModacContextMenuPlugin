@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Foswiki::Func    ();
+use Foswiki::Meta    ();
 use Foswiki::Plugins ();
 
 use Digest::SHA;
@@ -34,6 +35,7 @@ sub initPlugin {
   # rest handler to interact with FilesysVirtualPlugin
   Foswiki::Func::registerRESTHandler( 'isLocked', \&_restIsLocked, http_allow => 'GET', validate => 0, authenticate => 0 );
   Foswiki::Func::registerRESTHandler( 'tokenizer', \&_restTokenizer, http_allow => 'GET', validate => 0, authenticate => 1 );
+  Foswiki::Func::registerRESTHandler( 'attachHistory', \&_rest_attach_history, http_allow => 'GET', validate => 0, authenticate => 1 );
 
   my $jqAvailable = $Foswiki::cfg{Plugins}{JQueryPlugin}{Enabled};
   unless ( $jqAvailable ) {
@@ -72,7 +74,7 @@ META
 }
 
 sub _handlePrettyUserTag {
-  my( $session, $params, $topic, $web, $topicObject ) = @_;
+  my( $session, $params, $topic, $web, $topic_object ) = @_;
   my $wikiWord = $params->{_DEFAULT};
   if ( $wikiWord =~ /(.+)\.(.+)/ ) {
     return $2;
@@ -81,6 +83,38 @@ sub _handlePrettyUserTag {
   # ToDo: WikiWord -> Wiki Word
 
   return $wikiWord;
+}
+
+sub _rest_attach_history {
+  my ( $session, $subject, $verb, $response ) = @_;
+  my $query = $session->{request};
+
+  my $web = $query->{param}->{w}[0];
+  my $topic = $query->{param}->{t}[0];
+  my $attachment = $query->{param}->{a}[0];
+
+  my $change = Foswiki::Func::checkAccessPermission('VIEW', $session->{user}, undef, $topic, $web);
+  if ( $change ) {
+      my $topic_object = Foswiki::Meta->load($session, $web, $topic);
+      my $args = $topic_object->get( 'FILEATTACHMENT', $attachment);
+      $args = {
+          name => $attachment,
+          path => '',
+          comment => ''
+      } unless ($args);
+      $args->{attr} ||= '';
+
+      my $history = $session->attach->formatVersions($topic_object, %$args);
+      my $history_table = $topic_object->expandMacros($history);
+      $history_table =~ s/%TABLE\{[^\}]+\}%//;
+      $history_table =~ s/<a\s*href="([^"]+)">restore</<a class="foswikiRequiresChangePermission requireModacChangePermission" href="$1">restore</g;
+      $response->status(200);
+      return $history_table
+  } else {
+      # Forbidden
+      $response->status(403);
+      return '';
+  }
 }
 
 sub _restTokenizer {
