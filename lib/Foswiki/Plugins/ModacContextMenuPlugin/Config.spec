@@ -9,7 +9,7 @@ $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{UseContextMenu} = 0;
 # Open documents using the MS Office URI schemes.
 # Note: Minimum required Office versions: Office 2010 SP2, Office for Mac 2011
 # Further information: https://msdn.microsoft.com/en-us/library/office/dn906146.aspx
-$Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{OfficeURISchemes} = 0;
+$Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{OfficeURISchemes} = 1;
 
 # **BOOLEAN**
 # Enable integration for TopicInteractionPlugin
