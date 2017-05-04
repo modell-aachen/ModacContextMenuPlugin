@@ -69,12 +69,13 @@ var ContextMenu = function() {
         return unescape(prefs.davUrl);
     };
 
-    var isChrome = /Chrome/.test(navigator.userAgent);
+    var isChrome = /Chrome/.test(navigator.userAgent) && !/Edge/.test(navigator.userAgent);
     var isFirefox = /Firefox/.test(navigator.userAgent);
+    var isEdge = /Edge/.test(navigator.userAgent);
     var isIE = /MSIE|Trident/.test(navigator.userAgent);
 
     var isSupportedBrowser = function() {
-        var isSupported = isFirefox || isIE || isChrome;
+        var isSupported = isFirefox || isIE || isChrome || isEdge;
         return isSupported;
     };
 
@@ -222,6 +223,34 @@ var ContextMenu = function() {
         });
     };
 
+    // same as above but for Google's Chrome
+    var createUseURISchemesDialog = function() {
+        var d = $('<div></div>');
+        var text = formatString(lang.useURISchemesHintText);
+        $(d).html(text);
+
+        $(d).dialog({
+            title: lang.useURISchemesTitle,
+            width: 550,
+            height: 150,
+            resizable: false,
+            modal: true,
+            show: {
+                effect: 'fade',
+                duration: 500
+            },
+            hide: {
+                effect: 'fade',
+                duration: 300
+            },
+            buttons: [{
+                text: lang.btnCloseText,
+                click: function() {
+                    $(this).dialog('close');
+                }
+            }]
+        });
+    };
     // shows a login dialog.
     // called when the user tries to call an access restricted method (e.g. view history)
     var createLoginDialog = function(loginForm) {
@@ -496,6 +525,10 @@ var ContextMenu = function() {
                             self.checkChromeAddOn()
                                 .done(dispatch)
                                 .fail(createChromeAddonDialog);
+                           return;
+                        }
+                        if (isEdge) {
+                           createUseURISchemesDialog();
                            return;
                         }
                     }).fail(function(xhr, status, err) {
@@ -1208,7 +1241,7 @@ var ContextMenu = function() {
         return null;
     };
 
-    if (isChrome || isFirefox) {
+    if (isChrome || isFirefox || isEdge) {
         // Attach an invisible container.
         var hidden = '<div id="hiddenContainer" style="display:none;"></div>';
         $(hidden).appendTo('body');

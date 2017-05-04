@@ -48,6 +48,8 @@
       webdavFFLinkText: 'Mozilla Add-on Seite',
       webdavChromeHintTitle: 'Chrome Extension erforderlich',
       webdavChromeHintText: 'F\u00FCr diese Funktion ist eine weitere Chrome-Extension erforderlich.<br />Diese Erweiterung k\u00F6nnen Sie \u00FCber den offiziellen {0} herunterladen.',
+      useURISchemesTitle: 'Office URI Schemes aktivieren',
+      useURISchemesHintText: 'Um diese Funktion nutzen zu können, müssen die Office URI Schemes aktiviert werden. Sprechen Sie dafür bitte Ihren Administrator an.',
       webdavChromeLinkText: 'Google Web Store'
     };
 

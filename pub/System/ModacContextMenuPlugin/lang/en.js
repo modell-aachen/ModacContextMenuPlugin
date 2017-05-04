@@ -48,6 +48,8 @@
       webdavFFLinkText: 'Mozilla Add-on site',
       webdavChromeHintTitle: 'Chrome extension required',
       webdavChromeHintText: 'In order to use this functionality an additional extension is required.<br />This extension is available for download at the official {0}.',
+      useURISchemesTitle: 'Activate Office URI Schemes',
+      useURISchemesHintText: 'In order to use this functionality activate Office URI Schemes. Pleas ask your administrator.<br />.',
       webdavChromeLinkText: 'Google web store'
     };
 
