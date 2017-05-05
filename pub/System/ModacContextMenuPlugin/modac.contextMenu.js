@@ -223,7 +223,7 @@ var ContextMenu = function() {
         });
     };
 
-    // same as above but for Google's Chrome
+    // same as above but for Edge
     var createUseURISchemesDialog = function() {
         var d = $('<div></div>');
         var text = formatString(lang.useURISchemesHintText);
