@@ -27,7 +27,7 @@ BEGIN {
 use Foswiki::Contrib::Build;
 
 # Declare our build package
-package BuildBuild;
+package ModacContextMenuPluginBuild;
 use Foswiki::Contrib::Build;
 our @ISA = qw( Foswiki::Contrib::Build );
 
@@ -35,21 +35,37 @@ sub new {
     my $class = shift;
     return bless( $class->SUPER::new("ModacContextMenuPlugin"), $class );
 }
-
-# Example: Override the build target
-sub target_build {
+sub target_release {
     my $this = shift;
 
-    $this->SUPER::target_build();
+    print <<GUNK;
 
-    # Do other build stuff here
+Building release $this->{RELEASE} of $this->{project}, from version $this->{VERSION}
+GUNK
+    if ( $this->{-v} ) {
+        print 'Package name will be ', $this->{project}, "\n";
+        print 'Topic name will be ', $this->getTopicName(), "\n";
+    }
+
+    $this->_installDeps();
+
+    $this->build('compress');
+    $this->build('build');
+    $this->build('installer');
+    $this->build('stage');
+    $this->build('archive');
 }
 
-package main;
+sub _installDeps {
+  my $this = shift;
 
-# Create the build object
-my $build = new BuildBuild();
+  local $| = 1;
+  print $this->sys_action( qw(yarn) );
+  # note: on error BuildContrib will swallow up STDOUT, so we wouldn't see which tests failed
+  # print $this->sys_action( qw(yarn lint 1>&2) );
+  # print $this->sys_action( qw(yarn test 1>&2) );
+}
 
-# Build the target on the command line, or the default target
+my $build = ModacContextMenuPluginBuild->new();
 $build->build( $build->{target} );
 
