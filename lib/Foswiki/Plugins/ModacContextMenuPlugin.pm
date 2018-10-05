@@ -68,9 +68,9 @@ SCRIPT
 <link rel="stylesheet" type="text/css" media="all" href="$pluginUrl/modacContextMenu.css?version=$RELEASE" />
 META
 
-  Foswiki::Func::expandCommonVariables('%VUE{VERSION="2"}%%JSI18N{"ModacContextMenuPlugin" id="ModacContextMenu"}%');
+  Foswiki::Plugins::JSi18nPlugin::JSI18N($Foswiki::Plugins::SESSION, "ModacContextMenuPlugin", "ModacContextMenu");
   Foswiki::Func::addToZone( 'head', 'MODACCONTEXTMENUPLUGIN:STYLES', $meta );
-  Foswiki::Func::addToZone( 'script', 'MODACCONTEXTMENUPLUGIN:SCRIPTS', $script, 'MODACCONTEXTMENUPLUGIN:PREFS' );
+  Foswiki::Func::addToZone( 'script', 'MODACCONTEXTMENUPLUGIN:SCRIPTS', $script, 'MODACCONTEXTMENUPLUGIN:PREFS,jsi18nCore');
   Foswiki::Plugins::JQueryPlugin::createPlugin( 'blockui' );
   Foswiki::Plugins::JQueryPlugin::createPlugin( 'livequery' );
 

@@ -91,6 +91,7 @@ export default {
         if(data.response.numFound > 0){
             this.resultOtherWebs = data.response.docs.filter(d => d.web != this.web);
             this.resultWeb = data.response.docs.filter(d => d.web == this.web);
+            this.selectAll();
         }
     },
     methods: {
