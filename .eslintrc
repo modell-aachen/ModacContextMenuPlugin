@@ -1,0 +1,35 @@
+{
+    extends: [
+        "eslint:recommended",
+        "plugin:vue/recommended"
+    ],
+    parserOptions: {
+        "parser": "babel-eslint",
+        "ecmaVersion": 8,
+        "sourceType": "module"
+    },
+    plugins: [
+        "json",
+        "vue"
+    ],
+    env: {
+        "browser": true,
+        "node": true,
+        "commonjs": true,
+        "es6": true,
+        "jasmine": true
+    },
+    globals: {
+        "Vue": false,
+        "$": false,
+        "SearchGridPlugin": false
+    },
+    rules: {
+        "linebreak-style": ["error", "unix"],
+        "no-console": ["error", {allow: ["warn","error"]}],
+        "no-var": "warn",
+        "indent": ["error", 4],
+        "vue/html-indent": ["error", 4],
+        "vue/html-closing-bracket-newline": ["error", {"singleline":"never", "multiline":"never"}]
+    }
+}
