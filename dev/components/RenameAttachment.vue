@@ -121,7 +121,7 @@ export default {
         deselectAll (){
             this.selectedTopics = [];
         },
-        i18n: function maketext(text, ...$args) {
+        i18n (text, ...$args) {
             return Vue.foswiki.jsi18n.get('ModacContextMenu', text, ...$args);
         }
     }

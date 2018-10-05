@@ -61,9 +61,6 @@ sub _installDeps {
 
   local $| = 1;
   print $this->sys_action( qw(yarn) );
-  # note: on error BuildContrib will swallow up STDOUT, so we wouldn't see which tests failed
-  # print $this->sys_action( qw(yarn lint 1>&2) );
-  # print $this->sys_action( qw(yarn test 1>&2) );
 }
 
 my $build = ModacContextMenuPluginBuild->new();
