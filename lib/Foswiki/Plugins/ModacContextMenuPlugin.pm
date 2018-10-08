@@ -299,7 +299,7 @@ HTML
 sub afterRenameHandler {
     my ( $oldWeb, $oldTopic, $oldAttachment, $newWeb, $newTopic, $newAttachment ) = @_;
 
-    return unless $oldTopic; # don't handle webs
+    return unless $oldTopic; # do not handle Webs
     return unless $oldAttachment; # handle just attachments
 
     my $session = $Foswiki::Plugins::SESSION;
@@ -307,13 +307,13 @@ sub afterRenameHandler {
     my @topics = $query->param('referring_topics');
 
     my $options = {
-        oldWeb    => $oldWeb,
-        oldTopic  => $oldTopic,
-        newWeb    => $newWeb,
-        newTopic  => $newTopic,
-        inWeb     => $newWeb,
+        oldWeb    => "$oldWeb/$oldTopic",
+        oldTopic  => $oldAttachment,
+        newWeb    => "$newWeb/$newTopic",
+        newTopic  => $newAttachment,
         fullPaths => 0,
-        noautolink => 1
+        noautolink => 1,
+        inMeta => 1
     };
 
     # change referring topics
