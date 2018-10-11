@@ -85,7 +85,7 @@ export default {
     },
     mounted: async function() {
         $(this.$refs['renameSpinner']).spin(true);
-        let data = await this.fetch({q: `outgoingAttachment_lst:${this.web}.${this.topic}/${this.attachment}`});
+        let data = await this.fetch({q: `outgoingAttachment_lst:"${this.web}.${this.topic}/${this.attachment}"`});
         $(this.$refs['renameSpinner']).spin(false);
         this.isLoading = false;
         if(data.response.numFound > 0){
