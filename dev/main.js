@@ -1,6 +1,6 @@
 import RenameAttachment from './components/RenameAttachment.vue'
 
-Vue.onDocumentReady(() => {
+jQuery(($) => {
     Vue.component('rename-attachment', RenameAttachment);
 });
 

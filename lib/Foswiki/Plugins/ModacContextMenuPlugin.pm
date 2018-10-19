@@ -9,6 +9,8 @@ use Foswiki::Plugins ();
 
 use Foswiki::UI::Rename;
 
+use Foswiki::Plugins::VueJSPlugin;
+
 use Digest::SHA;
 use JSON;
 
@@ -56,6 +58,8 @@ sub initPlugin {
   my $langCode = $Foswiki::Plugins::SESSION->i18n->language;
   $langCode = 'en' unless $langCode =~ /en|de/i;
 
+  Foswiki::Plugins::VueJSPlugin::loadDependencies($Foswiki::Plugins::SESSION, {VERSION => 2}, $topic, $web);
+
   my $script = <<"SCRIPT";
 <script type="text/javascript" src="$pluginUrl/jquery.contextMenu.js?version=$RELEASE"></script>
 <script type="text/javascript" src="$pluginUrl/jquery.ui.position.js?version=$RELEASE"></script>
@@ -70,7 +74,7 @@ META
 
   Foswiki::Plugins::JSi18nPlugin::JSI18N($Foswiki::Plugins::SESSION, "ModacContextMenuPlugin", "ModacContextMenu");
   Foswiki::Func::addToZone( 'head', 'MODACCONTEXTMENUPLUGIN:STYLES', $meta );
-  Foswiki::Func::addToZone( 'script', 'MODACCONTEXTMENUPLUGIN:SCRIPTS', $script, 'MODACCONTEXTMENUPLUGIN:PREFS,jsi18nCore');
+  Foswiki::Func::addToZone( 'script', 'MODACCONTEXTMENUPLUGIN:SCRIPTS', $script, 'MODACCONTEXTMENUPLUGIN:PREFS,jsi18nCore,VUEJSPLUGIN');
   Foswiki::Plugins::JQueryPlugin::createPlugin( 'blockui' );
   Foswiki::Plugins::JQueryPlugin::createPlugin( 'livequery' );
 
