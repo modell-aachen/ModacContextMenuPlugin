@@ -52,7 +52,7 @@ $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{DisableActionHistory} = 0;
 $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{DisableActionMove} = 0;
 
 # **BOOLEAN EXPERT**
-$Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{DisableActionRename} = 0;
+$Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{DisableActionRename} = 1;
 
 # **BOOLEAN EXPERT**
 $Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{DisableActionRemove} = 0;

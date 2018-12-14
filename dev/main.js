@@ -1,6 +1,11 @@
+import RenameAttachment from './components/RenameAttachment.vue'
+
+jQuery(($) => {
+    Vue.component('rename-attachment', RenameAttachment);
+});
+
 var ContextMenu = function() {
     if (!window.foswiki.ModacContextMenuPluginLang) {
-        // window.console && console.log( 'No language specified.' );
         return;
     }
 
@@ -807,6 +812,7 @@ var ContextMenu = function() {
                                     }
                                 }]
                             });
+                            Vue.instantiateEach('.vue-rename-attachment');
                         }
                     });
                 }

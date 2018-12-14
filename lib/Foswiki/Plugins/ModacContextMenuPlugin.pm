@@ -7,6 +7,10 @@ use Foswiki::Func    ();
 use Foswiki::Meta    ();
 use Foswiki::Plugins ();
 
+use Foswiki::UI::Rename;
+
+use Foswiki::Plugins::VueJSPlugin;
+
 use Digest::SHA;
 use JSON;
 
@@ -31,6 +35,7 @@ sub initPlugin {
 
   # Removes the User's Web prefix. Intended for further modifications like wiki word to space separated word.
   Foswiki::Func::registerTagHandler( 'PRETTYUSER', \&_handlePrettyUserTag );
+  Foswiki::Func::registerTagHandler( 'RENAME_ATTACHMENT_LINKS', \&_tagRenameAttachment );
 
   # rest handler to interact with FilesysVirtualPlugin
   Foswiki::Func::registerRESTHandler( 'isLocked', \&_restIsLocked, http_allow => 'GET', validate => 0, authenticate => 0 );
@@ -53,19 +58,23 @@ sub initPlugin {
   my $langCode = $Foswiki::Plugins::SESSION->i18n->language;
   $langCode = 'en' unless $langCode =~ /en|de/i;
 
+  Foswiki::Plugins::VueJSPlugin::loadDependencies($Foswiki::Plugins::SESSION, {VERSION => 2}, $topic, $web);
+
   my $script = <<"SCRIPT";
 <script type="text/javascript" src="$pluginUrl/jquery.contextMenu.js?version=$RELEASE"></script>
 <script type="text/javascript" src="$pluginUrl/jquery.ui.position.js?version=$RELEASE"></script>
 <script type="text/javascript" src="$pluginUrl/lang/$langCode.js?version=$RELEASE"></script>
-<script type="text/javascript" src="$pluginUrl/modac.contextMenu.js?version=$RELEASE"></script>
+<script type="text/javascript" src="$pluginUrl/modacContextMenu.js?version=$RELEASE"></script>
 SCRIPT
 
   my $meta = <<"META";
 <link rel="stylesheet" type="text/css" media="all" href="$pluginUrl/jquery.contextMenu.css?version=$RELEASE" />
+<link rel="stylesheet" type="text/css" media="all" href="$pluginUrl/modacContextMenu.css?version=$RELEASE" />
 META
 
+  Foswiki::Plugins::JSi18nPlugin::JSI18N($Foswiki::Plugins::SESSION, "ModacContextMenuPlugin", "ModacContextMenu");
   Foswiki::Func::addToZone( 'head', 'MODACCONTEXTMENUPLUGIN:STYLES', $meta );
-  Foswiki::Func::addToZone( 'script', 'MODACCONTEXTMENUPLUGIN:SCRIPTS', $script, 'MODACCONTEXTMENUPLUGIN:PREFS' );
+  Foswiki::Func::addToZone( 'script', 'MODACCONTEXTMENUPLUGIN:SCRIPTS', $script, 'MODACCONTEXTMENUPLUGIN:PREFS,jsi18nCore,VUEJSPLUGIN');
   Foswiki::Plugins::JQueryPlugin::createPlugin( 'blockui' );
   Foswiki::Plugins::JQueryPlugin::createPlugin( 'livequery' );
 
@@ -278,6 +287,57 @@ sub _getWebDAVUrl {
   $location =~ s/\/*$//;
   $server =~ s/\/*$//;
   return "$server$location";
+}
+
+sub _tagRenameAttachment {
+    my ( $session, $params, $topic, $web, $meta ) = @_;
+
+    my $clientToken = Foswiki::Plugins::VueJSPlugin::getClientToken();
+    return <<HTML;
+        <div class="vue-rename-attachment" data-vue-client-token="$clientToken">
+            <rename-attachment attachment="$params->{attachment}" web="$web" topic="$topic"/>
+        </div>
+HTML
+}
+
+sub afterRenameHandler {
+    my ( $oldWeb, $oldTopic, $oldAttachment, $newWeb, $newTopic, $newAttachment ) = @_;
+
+    return unless $oldTopic; # do not handle Webs
+    return unless $oldAttachment; # handle just attachments
+
+    my $session = $Foswiki::Plugins::SESSION;
+    my $query = Foswiki::Func::getCgiQuery();
+    my @topics = $query->param('referring_topics');
+
+    my $options = {
+        oldWeb    => "$oldWeb/$oldTopic",
+        oldTopic  => $oldAttachment,
+        newWeb    => "$newWeb/$newTopic",
+        newTopic  => $newAttachment,
+        fullPaths => 0,
+        noautolink => 1,
+        inMeta => 1
+    };
+
+    # change referring topics
+    Foswiki::UI::Rename::_updateReferringTopics($session, \@topics, \&Foswiki::UI::Rename::_replaceTopicReferences, $options) if scalar(@topics) > 0;
+
+    #handle %ATTACHURLPATH%
+    _replaceATTACHURLPATH($session, $oldWeb, $oldTopic, $newWeb, $newTopic);
+}
+
+sub _replaceATTACHURLPATH {
+    my ($session, $oldWeb, $oldTopic, $newWeb, $newTopic) = @_;
+    my $topicObject = Foswiki::Meta->load( $session, $oldWeb, $oldTopic );
+
+    my $newText = '';
+    foreach my $line ( split( /([\r\n]+)/, $topicObject->text() ) ) {
+        $line =~ s/%ATTACHURLPATH%/%PUBURL%\/$newWeb\/$newTopic/g;
+        $newText .= $line;
+    }
+    $topicObject->text($newText);
+    $topicObject->save( minor => 1 );
 }
 
 1;
