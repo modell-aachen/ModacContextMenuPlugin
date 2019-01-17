@@ -35,7 +35,6 @@ sub initPlugin {
 
   # Removes the User's Web prefix. Intended for further modifications like wiki word to space separated word.
   Foswiki::Func::registerTagHandler( 'PRETTYUSER', \&_handlePrettyUserTag );
-  Foswiki::Func::registerTagHandler( 'RENAME_ATTACHMENT_LINKS', \&_tagRenameAttachment );
 
   # rest handler to interact with FilesysVirtualPlugin
   Foswiki::Func::registerRESTHandler( 'isLocked', \&_restIsLocked, http_allow => 'GET', validate => 0, authenticate => 0 );
@@ -287,57 +286,6 @@ sub _getWebDAVUrl {
   $location =~ s/\/*$//;
   $server =~ s/\/*$//;
   return "$server$location";
-}
-
-sub _tagRenameAttachment {
-    my ( $session, $params, $topic, $web, $meta ) = @_;
-
-    my $clientToken = Foswiki::Plugins::VueJSPlugin::getClientToken();
-    return <<HTML;
-        <div class="vue-rename-attachment" data-vue-client-token="$clientToken">
-            <rename-attachment attachment="$params->{attachment}" web="$web" topic="$topic"/>
-        </div>
-HTML
-}
-
-sub afterRenameHandler {
-    my ( $oldWeb, $oldTopic, $oldAttachment, $newWeb, $newTopic, $newAttachment ) = @_;
-
-    return unless $oldTopic; # do not handle Webs
-    return unless $oldAttachment; # handle just attachments
-
-    my $session = $Foswiki::Plugins::SESSION;
-    my $query = Foswiki::Func::getCgiQuery();
-    my @topics = $query->param('referring_topics');
-
-    my $options = {
-        oldWeb    => "$oldWeb/$oldTopic",
-        oldTopic  => $oldAttachment,
-        newWeb    => "$newWeb/$newTopic",
-        newTopic  => $newAttachment,
-        fullPaths => 0,
-        noautolink => 1,
-        inMeta => 1
-    };
-
-    # change referring topics
-    Foswiki::UI::Rename::_updateReferringTopics($session, \@topics, \&Foswiki::UI::Rename::_replaceTopicReferences, $options) if scalar(@topics) > 0;
-
-    #handle %ATTACHURLPATH%
-    _replaceATTACHURLPATH($session, $oldWeb, $oldTopic, $newWeb, $newTopic);
-}
-
-sub _replaceATTACHURLPATH {
-    my ($session, $oldWeb, $oldTopic, $newWeb, $newTopic) = @_;
-    my $topicObject = Foswiki::Meta->load( $session, $oldWeb, $oldTopic );
-
-    my $newText = '';
-    foreach my $line ( split( /([\r\n]+)/, $topicObject->text() ) ) {
-        $line =~ s/%ATTACHURLPATH%/%PUBURL%\/$newWeb\/$newTopic/g;
-        $newText .= $line;
-    }
-    $topicObject->text($newText);
-    $topicObject->save( minor => 1 );
 }
 
 1;
