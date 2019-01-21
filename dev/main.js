@@ -1,9 +1,3 @@
-import RenameAttachment from './components/RenameAttachment.vue'
-
-jQuery(($) => {
-    Vue.component('rename-attachment', RenameAttachment);
-});
-
 var ContextMenu = function() {
     if (!window.foswiki.ModacContextMenuPluginLang) {
         return;
