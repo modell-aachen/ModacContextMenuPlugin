@@ -3,7 +3,7 @@
 
 # **BOOLEAN**
 # Enable usage of context menu explicitly - required to support VirtualHostingContrib
-$Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{UseContextMenu} = 0;
+$Foswiki::cfg{Plugins}{ModacContextMenuPlugin}{UseContextMenu} = 1;
 
 # **BOOLEAN**
 # Open documents using the MS Office URI schemes.
