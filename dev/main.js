@@ -337,7 +337,7 @@ var ContextMenu = function() {
             app = 'project';
         }
 
-        window.location = ['ms-', app, ':', cmd, '|u|', url].join('');
+        window.location = ['ms-', app, ':', cmd, '|u|', encodeURI(url)].join('');
     };
 
     // Start Office app by using ActiveX
