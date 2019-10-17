@@ -68,7 +68,6 @@ SCRIPT
 
   my $meta = <<"META";
 <link rel="stylesheet" type="text/css" media="all" href="$pluginUrl/jquery.contextMenu.css?version=$RELEASE" />
-<link rel="stylesheet" type="text/css" media="all" href="$pluginUrl/modacContextMenu.css?version=$RELEASE" />
 META
 
   Foswiki::Plugins::JSi18nPlugin::JSI18N($Foswiki::Plugins::SESSION, "ModacContextMenuPlugin", "ModacContextMenu");
