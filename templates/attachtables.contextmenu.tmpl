@@ -14,5 +14,5 @@
 
 %{ A basic row definition, for attachment table and attach screen }%
 %{ Use %A_URL% instead of %PUBURLPATH%/%WEB%/%TOPIC%/%A_FILE% to get a viewfile link }%
-%TMPL:DEF{ATTACH:files:row(basic)}%<tr%TMPL:P{"ATTACH:files:row:attr"}%><td class='foswikiFirstCol'> %TMPL:P{"ATTACH:files:row(basic):buttons"}%</td><td class='iconCol'>%A_ICON%<span class="foswikiHidden">%A_EXT%</span></td><td class='attachmentLink'> <a href="%ATTACHURLPATH%/%ENCODE{%A_FILE%}%"><noautolink>%A_FILE%</noautolink>&nbsp;&raquo;</a></td><td>%A_SIZE%</td><td><span class="foswikiNoBreak">%A_DATE%</span></td><td>%RENDERUSER{"%A_USER%" convert="on"}%</td><td>%A_COMMENT%</td></tr>%TMPL:END%
+%TMPL:DEF{ATTACH:files:row(basic)}%<tr%TMPL:P{"ATTACH:files:row:attr"}%><td class='foswikiFirstCol'> %TMPL:P{"ATTACH:files:row(basic):buttons"}%</td><td class='iconCol'>%A_ICON%<span class="foswikiHidden">%A_EXT%</span></td><td class='attachmentLink'> <a href="%ATTACHURLPATH%/%ENCODE{"%A_FILE%"}%"><noautolink>%A_FILE%</noautolink>&nbsp;&raquo;</a></td><td>%A_SIZE%</td><td><span class="foswikiNoBreak">%A_DATE%</span></td><td>%RENDERUSER{"%A_USER%" convert="on"}%</td><td>%A_COMMENT%</td></tr>%TMPL:END%
 
